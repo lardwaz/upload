@@ -139,8 +139,8 @@ func Upload(fileName string, fileContent []byte, options *Options) (string, stri
 }
 
 // Delete deletes one file
-func Delete(fp string) error {
-	if err := os.Remove(fp); err != nil {
+func Delete(filePath string) error {
+	if err := os.Remove(filePath); err != nil {
 		return err
 	}
 	return nil
