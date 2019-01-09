@@ -128,6 +128,11 @@ func SetWatermarkImage(path string) {
 	_diskPathWatermark = path
 }
 
+// SetAssetBox sets the asset box to retrieve static assets
+func SetAssetBox(assetBox assetBoxer) {
+	_assetBox = assetBox
+}
+
 // New returns an instance of imagist, with the internal go routine awaiting jobs over the channel
 func New(chansize ...int) *Imagist {
 	var s int
@@ -150,7 +155,7 @@ func New(chansize ...int) *Imagist {
 
 //listen starts listening for jobs on the internal channel
 func (i Imagist) listen() {
-	jobs := make(map[string]interface{})
+	jobs := make(map[string]struct{})
 
 	for {
 		select {
@@ -158,7 +163,7 @@ func (i Imagist) listen() {
 			delete(jobs, done)
 		case job := <-i.jobs:
 			if _, exists := jobs[job.FileDiskPath]; !exists {
-				jobs[job.FileDiskPath] = nil
+				jobs[job.FileDiskPath] = struct{}{}
 				go i.execute(job)
 			}
 		}
@@ -188,17 +193,15 @@ func (i Imagist) Add(buf []byte, fileDiskPath string, dimensions *ImageDimension
 		return fmt.Errorf("image type %s invalid", imgType)
 	}
 
-	if validate {
-		// Check min width and height
-		if dimensions.MinWidth != core.NoLimit && config.Width < dimensions.MinWidth {
-			log.Printf("image %v lower than min width: %v\n", fileDiskPath, dimensions.MinWidth)
-			return fmt.Errorf("image width less than %dpx", dimensions.MinWidth)
-		}
+	// Check min width and height
+	if validate && dimensions.MinWidth != core.NoLimit && config.Width < dimensions.MinWidth {
+		log.Printf("image %v lower than min width: %v\n", fileDiskPath, dimensions.MinWidth)
+		return fmt.Errorf("image width less than %dpx", dimensions.MinWidth)
+	}
 
-		if dimensions.MinHeight != core.NoLimit && config.Height < dimensions.MinHeight {
-			log.Printf("image %v lower than min height: %v\n", fileDiskPath, dimensions.MinHeight)
-			return fmt.Errorf("image height less than %dpx", dimensions.MinHeight)
-		}
+	if validate && dimensions.MinHeight != core.NoLimit && config.Height < dimensions.MinHeight {
+		log.Printf("image %v lower than min height: %v\n", fileDiskPath, dimensions.MinHeight)
+		return fmt.Errorf("image height less than %dpx", dimensions.MinHeight)
 	}
 
 	job := Job{
@@ -346,9 +349,7 @@ func imageProcess(j Job, format FormatDimensions) error {
 		return errors.Wrap(err, "image get format error")
 	}
 
-	newDiskPath := imgDiskPath + ":" + format.Name
-
-	outputFile, err := os.Create(newDiskPath)
+	outputFile, err := os.Create(imgDiskPath + ":" + format.Name)
 	if err != nil {
 		return errors.Wrap(err, "image get format error")
 	}
