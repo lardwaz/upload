@@ -217,35 +217,38 @@ func (i Imagist) execute(j Job) {
 			continue
 		}
 
-		newWidth := format.Width
-		newHeight := format.Height
-
-		// Do not upscale
-		if j.Config.Width < format.Width {
-			newWidth = j.Config.Width
-		}
-		if j.Config.Height < j.Config.Height {
-			newHeight = j.Config.Height
-		}
-
-		landscape := j.Config.Height < j.Config.Width
-
-		imageProcess(j.FileDiskPath, newWidth, newHeight, landscape, format)
+		imageProcess(j, format)
 	}
 
 	i.done <- j.FileDiskPath
 }
 
-func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, format FormatDimensions) error {
+func imageProcess(j Job, format FormatDimensions) error {
 	var (
 		img image.Image
 		err error
 	)
 
+	imgDiskPath := j.FileDiskPath
+
 	img, err = imaging.Open(imgDiskPath)
 	if err != nil {
 		return errors.Wrap(err, "image open error")
 	}
+
+	// Prepare meta for processing
+	newWidth := format.Width
+	newHeight := format.Height
+
+	// Do not upscale
+	if j.Config.Width < format.Width {
+		newWidth = j.Config.Width
+	}
+	if j.Config.Height < j.Config.Height {
+		newHeight = j.Config.Height
+	}
+
+	landscape := j.Config.Height < j.Config.Width
 
 	// Do not crop and resize when using backdrop but downscale
 	if _diskPathBackdrop != "" && format.Backdrop && !landscape {

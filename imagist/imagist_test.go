@@ -141,11 +141,8 @@ func TestImagist_execute(t *testing.T) {
 
 func Test_imageProcess(t *testing.T) {
 	type args struct {
-		imgDiskPath string
-		newWidth    int
-		newHeight   int
-		landscape   bool
-		format      FormatDimensions
+		job    Job
+		format FormatDimensions
 	}
 	tests := []struct {
 		name    string
@@ -156,7 +153,7 @@ func Test_imageProcess(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := imageProcess(tt.args.imgDiskPath, tt.args.newWidth, tt.args.newHeight, tt.args.landscape, tt.args.format); (err != nil) != tt.wantErr {
+			if err := imageProcess(tt.args.job, tt.args.format); (err != nil) != tt.wantErr {
 				t.Errorf("imageProcess() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
