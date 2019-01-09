@@ -91,7 +91,6 @@ func TestImagist_Add(t *testing.T) {
 		fileDiskPath string
 		dimensions   *ImageDimensions
 		validate     bool
-		env          string
 	}
 	tests := []struct {
 		name    string
@@ -107,7 +106,7 @@ func TestImagist_Add(t *testing.T) {
 				jobs: tt.fields.jobs,
 				done: tt.fields.done,
 			}
-			if err := i.Add(tt.args.buf, tt.args.fileDiskPath, tt.args.dimensions, tt.args.validate, tt.args.env); (err != nil) != tt.wantErr {
+			if err := i.Add(tt.args.buf, tt.args.fileDiskPath, tt.args.dimensions, tt.args.validate); (err != nil) != tt.wantErr {
 				t.Errorf("Imagist.Add() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -147,7 +146,6 @@ func Test_imageProcess(t *testing.T) {
 		newHeight   int
 		landscape   bool
 		format      FormatDimensions
-		env         string
 	}
 	tests := []struct {
 		name    string
@@ -158,7 +156,7 @@ func Test_imageProcess(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := imageProcess(tt.args.imgDiskPath, tt.args.newWidth, tt.args.newHeight, tt.args.landscape, tt.args.format, tt.args.env); (err != nil) != tt.wantErr {
+			if err := imageProcess(tt.args.imgDiskPath, tt.args.newWidth, tt.args.newHeight, tt.args.landscape, tt.args.format); (err != nil) != tt.wantErr {
 				t.Errorf("imageProcess() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

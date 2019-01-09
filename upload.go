@@ -65,6 +65,9 @@ func SetEnv(env string) {
 		return
 	}
 	_env = env
+
+	// Set environment of file processing packages (e.g Imagist)
+	imagist.SetEnv(_env)
 }
 
 // Upload validates and saves create file
@@ -116,7 +119,7 @@ func Upload(fileName string, fileContent []byte, options *Options) (string, stri
 
 	switch options.FileType {
 	case TypeImage:
-		err := _imagist.Add(buf, fileDiskPath, options.ImgDimensions, true, _env)
+		err := _imagist.Add(buf, fileDiskPath, options.ImgDimensions, true)
 		return fileDiskPath, filePath, err
 	case TypeVideo:
 		// TODO: Not yet implemented
@@ -207,7 +210,7 @@ func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Printf("error opening %v: %v\n", fileDiskPath, err)
 		}
 
-		_imagist.Add(buf, fileDiskPath, s.opts.ImgDimensions, false, _env)
+		_imagist.Add(buf, fileDiskPath, s.opts.ImgDimensions, false)
 
 	}()
 	http.Redirect(w, r, p, http.StatusTemporaryRedirect)

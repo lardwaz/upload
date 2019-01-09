@@ -35,10 +35,6 @@ const (
 	Center
 )
 
-type assetBoxer interface {
-	Open(string) (*os.File, error)
-}
-
 var (
 	// DefaultDimensions represent default dimensions to use, they have no limit (preserve original)
 	DefaultDimensions = ImageDimensions{
@@ -69,6 +65,8 @@ var (
 	BottomLeft = &WatermarkPosition{Horizontal: Left, Vertical: Bottom}
 	// CenterLeft is the center-left position for watermark
 	CenterLeft = &WatermarkPosition{Horizontal: Left, Vertical: Center}
+
+	_env = util.EnvironmentDEV
 )
 
 // Imagist is an image processing mechanism
@@ -82,7 +80,6 @@ type Job struct {
 	FileDiskPath string
 	Config       *image.Config
 	Dimensions   *ImageDimensions
-	Env          string
 }
 
 // ImageDimensions holds dimensions options
@@ -108,14 +105,31 @@ type WatermarkPosition struct {
 	OffsetX    int
 	OffsetY    int
 }
+
 type subImager interface {
 	SubImage(r image.Rectangle) image.Image
+}
+
+type assetBoxer interface {
+	Open(string) (*os.File, error)
 }
 
 func init() {
 	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
+}
+
+// SetEnv sets the environment gocipe-upload operates in
+func SetEnv(env string) {
+	switch env {
+	case util.EnvironmentDEV, util.EnvironmentPROD:
+		// We are good :)
+	default:
+		// Invalid environment
+		return
+	}
+	_env = env
 }
 
 // SetBackdropImage sets the disk path for backdrop images
@@ -166,7 +180,7 @@ func (i Imagist) listen() {
 }
 
 // Add creates a job entry for processing
-func (i Imagist) Add(buf []byte, fileDiskPath string, dimensions *ImageDimensions, validate bool, env string) error {
+func (i Imagist) Add(buf []byte, fileDiskPath string, dimensions *ImageDimensions, validate bool) error {
 	if !filetype.IsImage(buf) {
 		return fmt.Errorf("image type invalid")
 	}
@@ -205,7 +219,6 @@ func (i Imagist) Add(buf []byte, fileDiskPath string, dimensions *ImageDimension
 		FileDiskPath: fileDiskPath,
 		Config:       &config,
 		Dimensions:   dimensions,
-		Env:          env,
 	}
 	i.jobs <- job
 
@@ -231,13 +244,13 @@ func (i Imagist) execute(j Job) {
 
 		landscape := j.Config.Height < j.Config.Width
 
-		imageProcess(j.FileDiskPath, newWidth, newHeight, landscape, format, j.Env)
+		imageProcess(j.FileDiskPath, newWidth, newHeight, landscape, format)
 	}
 
 	i.done <- j.FileDiskPath
 }
 
-func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, format FormatDimensions, env string) error {
+func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, format FormatDimensions) error {
 	var (
 		img image.Image
 		err error
@@ -255,7 +268,7 @@ func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, f
 
 		// Open a new image to use as backdrop layer
 		var back image.Image
-		if env == util.EnvironmentDEV {
+		if _env == util.EnvironmentDEV {
 			back, err = imaging.Open("../assets/" + _diskPathBackdrop)
 		} else {
 			var staticAsset *os.File
@@ -285,7 +298,7 @@ func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, f
 
 	if format.Watermark != nil {
 		var watermark image.Image
-		if env == util.EnvironmentDEV {
+		if _env == util.EnvironmentDEV {
 			watermark, err = imaging.Open("../assets/" + _diskPathWatermark + ":" + format.Name)
 		} else {
 			var staticAsset *os.File
