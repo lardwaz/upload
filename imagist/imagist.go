@@ -120,7 +120,7 @@ func init() {
 	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
 }
 
-// SetEnv sets the environment gocipe-upload operates in
+// SetEnv sets the environment imagist operates in
 func SetEnv(env string) {
 	switch env {
 	case util.EnvironmentDEV, util.EnvironmentPROD:
@@ -262,7 +262,7 @@ func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, f
 	}
 
 	// Do not crop and resize when using backdrop but downscale
-	if format.Backdrop && !landscape {
+	if _diskPathBackdrop != "" && format.Backdrop && !landscape {
 		// Scale down srcImage to fit the bounding box
 		img = imaging.Fit(img, newWidth, newHeight, imaging.Lanczos)
 
@@ -291,12 +291,12 @@ func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, f
 
 		// Overlay image in center on backdrop layer
 		img = imaging.OverlayCenter(back, img, 1.0)
-	} else {
+	} else if _diskPathBackdrop != "" {
 		// Resize and crop the image to fill the [newWidth x newHeight] area
 		img = imaging.Fill(img, newWidth, newHeight, imaging.Center, imaging.Lanczos)
 	}
 
-	if format.Watermark != nil {
+	if _diskPathWatermark != "" && format.Watermark != nil {
 		var watermark image.Image
 		if _env == util.EnvironmentDEV {
 			watermark, err = imaging.Open("../assets/" + _diskPathWatermark + ":" + format.Name)
