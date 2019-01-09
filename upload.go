@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lsldigital/gocipe-upload/core"
 	"github.com/lsldigital/gocipe-upload/imagist"
-	"github.com/lsldigital/gocipe-upload/util"
 
 	"github.com/gosimple/slug"
 )
@@ -47,27 +47,10 @@ const (
 
 var (
 	_imagist *imagist.Imagist
-
-	_env = util.EnvironmentDEV
 )
 
 func init() {
 	_imagist = imagist.New()
-}
-
-// SetEnv sets the environment gocipe-upload operates in
-func SetEnv(env string) {
-	switch env {
-	case util.EnvironmentDEV, util.EnvironmentPROD:
-		// We are good :)
-	default:
-		// Invalid environment
-		return
-	}
-	_env = env
-
-	// Set environment of file processing packages (e.g Imagist)
-	imagist.SetEnv(_env)
 }
 
 // Upload validates and saves create file
@@ -105,7 +88,7 @@ func Upload(fileName string, fileContent []byte, options *Options) (string, stri
 	}
 
 	fileSize := len(buf)
-	if options.MaxSize != util.NoLimit && fileSize > options.MaxSize {
+	if options.MaxSize != core.NoLimit && fileSize > options.MaxSize {
 		log.Printf("file %v greater than max file size: %v\n", fileName, options.MaxSize)
 		return fileDiskPath, filePath, fmt.Errorf("file max size error")
 	}

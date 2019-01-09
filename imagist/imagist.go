@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/disintegration/imaging"
-	"github.com/lsldigital/gocipe-upload/util"
+	"github.com/lsldigital/gocipe-upload/core"
 	"github.com/pkg/errors"
 	filetype "gopkg.in/h2non/filetype.v1"
 )
@@ -38,8 +38,8 @@ const (
 var (
 	// DefaultDimensions represent default dimensions to use, they have no limit (preserve original)
 	DefaultDimensions = ImageDimensions{
-		MinWidth:  util.NoLimit,
-		MinHeight: util.NoLimit,
+		MinWidth:  core.NoLimit,
+		MinHeight: core.NoLimit,
 	}
 
 	// Disk paths to static assets
@@ -65,8 +65,6 @@ var (
 	BottomLeft = &WatermarkPosition{Horizontal: Left, Vertical: Bottom}
 	// CenterLeft is the center-left position for watermark
 	CenterLeft = &WatermarkPosition{Horizontal: Left, Vertical: Center}
-
-	_env = util.EnvironmentDEV
 )
 
 // Imagist is an image processing mechanism
@@ -118,18 +116,6 @@ func init() {
 	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
-}
-
-// SetEnv sets the environment imagist operates in
-func SetEnv(env string) {
-	switch env {
-	case util.EnvironmentDEV, util.EnvironmentPROD:
-		// We are good :)
-	default:
-		// Invalid environment
-		return
-	}
-	_env = env
 }
 
 // SetBackdropImage sets the disk path for backdrop images
@@ -204,12 +190,12 @@ func (i Imagist) Add(buf []byte, fileDiskPath string, dimensions *ImageDimension
 
 	if validate {
 		// Check min width and height
-		if dimensions.MinWidth != util.NoLimit && config.Width < dimensions.MinWidth {
+		if dimensions.MinWidth != core.NoLimit && config.Width < dimensions.MinWidth {
 			log.Printf("image %v lower than min width: %v\n", fileDiskPath, dimensions.MinWidth)
 			return fmt.Errorf("image width less than %dpx", dimensions.MinWidth)
 		}
 
-		if dimensions.MinHeight != util.NoLimit && config.Height < dimensions.MinHeight {
+		if dimensions.MinHeight != core.NoLimit && config.Height < dimensions.MinHeight {
 			log.Printf("image %v lower than min height: %v\n", fileDiskPath, dimensions.MinHeight)
 			return fmt.Errorf("image height less than %dpx", dimensions.MinHeight)
 		}
@@ -268,7 +254,7 @@ func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, f
 
 		// Open a new image to use as backdrop layer
 		var back image.Image
-		if _env == util.EnvironmentDEV {
+		if core.Env == core.EnvironmentDEV {
 			back, err = imaging.Open("../assets/" + _diskPathBackdrop)
 		} else {
 			var staticAsset *os.File
@@ -298,7 +284,7 @@ func imageProcess(imgDiskPath string, newWidth, newHeight int, landscape bool, f
 
 	if _diskPathWatermark != "" && format.Watermark != nil {
 		var watermark image.Image
-		if _env == util.EnvironmentDEV {
+		if core.Env == core.EnvironmentDEV {
 			watermark, err = imaging.Open("../assets/" + _diskPathWatermark + ":" + format.Name)
 		} else {
 			var staticAsset *os.File
