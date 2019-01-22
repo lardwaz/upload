@@ -27,6 +27,7 @@ type Uploaded interface {
 type UploadedFile struct {
 	url      string
 	diskPath string
+	content  []byte
 	options  options
 }
 
@@ -78,6 +79,8 @@ func (u *UploadedFile) Save(content []byte, overwrite bool) error {
 		log.Printf("error writing %v: %v\n", u.DiskPath(), err)
 		return err
 	}
+
+	u.content = content
 
 	return nil
 }
