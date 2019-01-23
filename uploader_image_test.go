@@ -2,6 +2,7 @@ package upload
 
 // Basic imports
 import (
+	"flag"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -13,11 +14,14 @@ const (
 	testFolder = "testdata"
 )
 
+var update = flag.Bool("update", false, "update golden files")
+
 type imageUploadTest struct {
-	name         string
-	inputFile    string
-	expectedFile string
-	uploader     ImageUpload
+	name          string
+	inputFile     string
+	expectedFile  string
+	expectedError bool
+	uploader      ImageUpload
 }
 
 type UploaderTestSuite struct {
@@ -28,7 +32,18 @@ type UploaderTestSuite struct {
 func (s *UploaderTestSuite) SetupTest() {
 	// Test cases
 	s.imageUploadTests = []imageUploadTest{
-		{"Normal JPG", "normal.jpg", "normal_out.jpg",
+		{"Normal JPG", "normal.jpg", "normal_out.jpg", false,
+			NewImageUploader(
+				EvaluateOptions(
+					Dir(testFolder),
+					Destination("uploaded"),
+					MediaPrefixURL("/testdata/"),
+					FileType(TypeImage),
+					ConvertTo(typeImageJPEG),
+				),
+			),
+		},
+		{"Normal PNG", "normal.png", "normal_out.png", false,
 			NewImageUploader(
 				EvaluateOptions(
 					Dir(testFolder),
@@ -42,33 +57,44 @@ func (s *UploaderTestSuite) SetupTest() {
 	}
 }
 
-func (s *UploaderTestSuite) TestUpload() {
+func (s *UploaderTestSuite) TestImageUpload() {
 	for _, tt := range s.imageUploadTests {
 		inputContent, err := ioutil.ReadFile(filepath.Join(testFolder, tt.inputFile))
-		if s.NotNil(err) {
-			s.FailNowf("Cannot open input golden file", "%s: %v", tt.inputFile, err)
-		}
-
-		expectedContent, err := ioutil.ReadFile(filepath.Join(testFolder, tt.expectedFile))
-		if s.NotNil(err) {
-			s.FailNowf("Cannot open output golden file", "%s: %v", tt.expectedFile, err)
+		if err != nil {
+			s.FailNowf("Cannot open input golden file", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
 		}
 
 		uploaded, err := tt.uploader.Upload(tt.inputFile, inputContent)
-		if s.NotNil(err) {
-			s.FailNowf("Cannot upload", "%s: %v", tt.inputFile, err)
+		if err != nil {
+			s.FailNowf("Cannot upload", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
+		} else if tt.expectedError {
+			// Success!
+			return
 		}
 
 		content, err := ioutil.ReadFile(uploaded.DiskPath())
-		if s.NotNil(err) {
-			s.FailNowf("Cannot open uploaded file", "%s: %v", uploaded.DiskPath(), err)
+		if err != nil {
+			s.FailNowf("Cannot open uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
+		}
+
+		if *update {
+			if err = ioutil.WriteFile(filepath.Join(testFolder, tt.expectedFile), content, 0644); err != nil {
+				s.FailNowf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
+			}
+		}
+
+		expectedContent, err := ioutil.ReadFile(filepath.Join(testFolder, tt.expectedFile))
+		if err != nil {
+			s.FailNowf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
 		}
 
 		// Check if file content valid
-		s.Equal(expectedContent, content, "Uploaded content invalid")
+		s.Equalf(expectedContent, content, "Case: \"%s\". Uploaded content invalid", tt.name)
 
 		// Cleanup
-		s.Errorf(uploaded.Delete(), "Cannot delete uploaded file %s: %v", uploaded.DiskPath(), err)
+		if err = uploaded.Delete(); err != nil {
+			s.FailNowf("Cannot delete uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
+		}
 	}
 }
 
