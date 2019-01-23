@@ -65,11 +65,11 @@ func (s *UploaderTestSuite) TestImageUpload() {
 		}
 
 		uploaded, err := tt.uploader.Upload(tt.inputFile, inputContent)
-		if err != nil {
-			s.FailNowf("Cannot upload", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
-		} else if tt.expectedError {
-			// Success!
+		if tt.expectedError && err != nil {
+			// No problemo; we anticipated!
 			return
+		} else if err != nil {
+			s.FailNowf("Cannot upload", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
 		}
 
 		content, err := ioutil.ReadFile(uploaded.DiskPath())
