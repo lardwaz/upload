@@ -5,9 +5,9 @@ type ImageUpload struct {
 	imageOpts optionsImage
 }
 
-func NewImageUploader(common options, opts ...OptionImage) ImageUpload {
-	options := EvaluateImageOptions(opts)
-	return ImageUpload{fileOpts: common, imageOpts: *options}
+func NewImageUploader(common *options, opts ...OptionImage) ImageUpload {
+	options := EvaluateImageOptions(opts...)
+	return ImageUpload{fileOpts: *common, imageOpts: *options}
 }
 
 func (u *ImageUpload) Upload(name string, content []byte) (UploadedFile, error) {

@@ -23,7 +23,7 @@ type options struct {
 	convertTo      string
 }
 
-func EvaluateOptions(opts []Option) *options {
+func EvaluateOptions(opts ...Option) *options {
 	optCopy := &options{}
 	*optCopy = *defaultOptions
 	for _, o := range opts {
