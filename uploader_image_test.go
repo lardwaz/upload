@@ -17,11 +17,12 @@ const (
 var update = flag.Bool("update", false, "update golden files")
 
 type imageUploadTest struct {
-	name          string
-	inputFile     string
-	expectedFile  string
-	expectedError bool
-	uploader      ImageUpload
+	name                 string
+	inputFile            string
+	expectedFile         string
+	expectedUploadError  bool
+	expectedContentError bool
+	uploader             ImageUpload
 }
 
 type UploaderTestSuite struct {
@@ -29,42 +30,32 @@ type UploaderTestSuite struct {
 	imageUploadTests []imageUploadTest
 }
 
-func (s *UploaderTestSuite) SetupTest() {
+func (s *UploaderTestSuite) SetupSuite() {
+	// Common upload configurations
+	commonJPEG := EvaluateOptions(
+		Dir(testFolder),
+		Destination("uploaded"),
+		MediaPrefixURL("/testdata/"),
+		FileType(TypeImage),
+		ConvertTo(typeImageJPEG),
+	)
+	commonPNG := EvaluateOptions(
+		Dir(testFolder),
+		Destination("uploaded"),
+		MediaPrefixURL("/testdata/"),
+		FileType(TypeImage),
+		ConvertTo(typeImagePNG),
+	)
+
 	// Test cases
 	s.imageUploadTests = []imageUploadTest{
-		{"Normal JPG", "normal.jpg", "normal_out.jpg", false,
-			NewImageUploader(
-				EvaluateOptions(
-					Dir(testFolder),
-					Destination("uploaded"),
-					MediaPrefixURL("/testdata/"),
-					FileType(TypeImage),
-					ConvertTo(typeImageJPEG),
-				),
-			),
-		},
-		{"Normal PNG", "normal.png", "normal_out.png", false,
-			NewImageUploader(
-				EvaluateOptions(
-					Dir(testFolder),
-					Destination("uploaded"),
-					MediaPrefixURL("/testdata/"),
-					FileType(TypeImage),
-					ConvertTo(typeImagePNG),
-				),
-			),
-		},
-		{"Transparent PNG", "transparent.png", "transparent_out.png", false,
-			NewImageUploader(
-				EvaluateOptions(
-					Dir(testFolder),
-					Destination("uploaded"),
-					MediaPrefixURL("/testdata/"),
-					FileType(TypeImage),
-					ConvertTo(typeImagePNG),
-				),
-			),
-		},
+		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, NewImageUploader(commonJPEG)},
+		{"Normal PNG", "normal.png", "normal_out.png", false, false, NewImageUploader(commonPNG)},
+		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, NewImageUploader(commonPNG)},
+		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, NewImageUploader(commonJPEG)},
+		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, NewImageUploader(commonPNG)},
+		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", false, false, NewImageUploader(commonJPEG)},
+		{"Damaged PNG", "damaged.png", "damaged_out.png", false, false, NewImageUploader(commonPNG)},
 	}
 }
 
@@ -76,7 +67,7 @@ func (s *UploaderTestSuite) TestImageUpload() {
 		}
 
 		uploaded, err := tt.uploader.Upload(tt.inputFile, inputContent)
-		if tt.expectedError && err != nil {
+		if tt.expectedUploadError && err != nil {
 			// No problemo; we anticipated!
 			return
 		} else if err != nil {
@@ -84,7 +75,10 @@ func (s *UploaderTestSuite) TestImageUpload() {
 		}
 
 		content, err := ioutil.ReadFile(uploaded.DiskPath())
-		if err != nil {
+		if tt.expectedContentError && err != nil {
+			// No problemo; we anticipated!
+			return
+		} else if err != nil {
 			s.FailNowf("Cannot open uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
 		}
 
