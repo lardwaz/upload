@@ -100,9 +100,8 @@ func (u *UploadedFile) ChangeExt(newExt string) error {
 	}
 
 	oldExt := path.Ext(u.DiskPath())
-	newExt = strings.TrimPrefix(oldExt, ".") + "." + newExt
-	newFileDiskPath := strings.TrimSuffix(u.DiskPath(), oldExt) + newExt
-	newFileURLPath := strings.TrimSuffix(u.URLPath(), oldExt) + newExt
+	newFileDiskPath := strings.TrimSuffix(u.DiskPath(), oldExt) + "." + newExt
+	newFileURLPath := strings.TrimSuffix(u.URLPath(), oldExt) + "." + newExt
 
 	if err := os.Rename(u.DiskPath(), newFileDiskPath); err != nil {
 		return fmt.Errorf("image ext change to %v failed", newExt)
