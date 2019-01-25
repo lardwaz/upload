@@ -292,7 +292,9 @@ func (p *ImageProcessor) process(job Job) {
 		}
 		defer outputFile.Close()
 
-		imaging.Encode(outputFile, img, imagingFormat)
+		if err := imaging.Encode(outputFile, img, imagingFormat); err != nil {
+			log.Printf("Image encode format error: %v", err)
+		}
 	}
 
 	p.done <- job.File.DiskPath()
