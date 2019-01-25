@@ -12,7 +12,7 @@ type optionsWatermark struct {
 	offsetY    int
 }
 
-func EvaluateWatermarkOptions(opts []OptionWatermark) *optionsWatermark {
+func EvaluateWatermarkOptions(opts ...OptionWatermark) *optionsWatermark {
 	optCopy := &optionsWatermark{}
 	*optCopy = *defaultWatermarkOptions
 	for _, o := range opts {

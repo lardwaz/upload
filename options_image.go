@@ -56,7 +56,7 @@ func Format(name string, width int, height int, backdrop bool, opts ...OptionWat
 			width:     width,
 			height:    height,
 			backdrop:  backdrop,
-			watermark: EvaluateWatermarkOptions(opts),
+			watermark: EvaluateWatermarkOptions(opts...),
 		}
 		o.formats = append(o.formats, imageFormat)
 	}
