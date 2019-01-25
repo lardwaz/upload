@@ -1,23 +1,23 @@
 package upload
 
-type ImageUpload struct {
-	fileOpts  options
-	imageOpts optionsImage
+type ImageUploader struct {
+	options  *options
+	processor *ImageProcessor
 }
 
-func NewImageUploader(common *options, opts ...OptionImage) ImageUpload {
-	options := EvaluateImageOptions(opts...)
-	return ImageUpload{fileOpts: *common, imageOpts: *options}
+func NewImageUploader(common *options, opts ...OptionImage) *ImageUploader {
+	processor := NewImageProcessor(opts...)
+	return &ImageUploader{options: common, processor: processor}
 }
 
-func (u *ImageUpload) Upload(name string, content []byte) (UploadedFile, error) {
-	uploadedFile := NewUploadedFile(name, u.fileOpts)
+func (u *ImageUploader) Upload(name string, content []byte) (UploadedFile, error) {
+	uploadedFile := NewUploadedFile(name, *u.options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
 		return uploadedFile, err
 	}
 
-	if err := uploadedFile.ChangeExt(u.fileOpts.convertTo); err != nil {
+	if err := uploadedFile.ChangeExt(u.options.convertTo); err != nil {
 		return uploadedFile, err
 	}
 

@@ -23,7 +23,7 @@ type imageUploadTest struct {
 	expectedUploadError  bool
 	expectedContentError bool
 	expectedProcessError bool
-	uploader             ImageUpload
+	uploader             *ImageUploader
 }
 
 type UploaderTestSuite struct {

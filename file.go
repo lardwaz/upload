@@ -18,6 +18,7 @@ import (
 type Uploaded interface {
 	URLPath() string
 	DiskPath() string
+	Content() []byte
 	Save(content []byte, overwrite bool) error
 	Delete() error
 	ChangeExt(newExt string) error
@@ -53,6 +54,11 @@ func (u *UploadedFile) URLPath() string {
 // DiskPath returns the path of file on disk
 func (u *UploadedFile) DiskPath() string {
 	return u.diskPath
+}
+
+// Content returns the path of file on disk
+func (u *UploadedFile) Content() []byte {
+	return u.content
 }
 
 // Save saves file on disk if it does not exist
