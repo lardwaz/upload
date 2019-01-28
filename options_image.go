@@ -36,20 +36,24 @@ func EvaluateImageOptions(opts ...OptionImage) *optionsImage {
 	return optCopy
 }
 
+// OptionImage is a function to modify options image
 type OptionImage func(*optionsImage)
 
+// MinWidth returns a function to modify MinWidth option image
 func MinWidth(d int) OptionImage {
 	return func(o *optionsImage) {
 		o.minWidth = d
 	}
 }
 
+// MinHeight returns a function to modify MinHeight option image
 func MinHeight(d int) OptionImage {
 	return func(o *optionsImage) {
 		o.minHeight = d
 	}
 }
 
+// Format returns a function to add Format option image
 func Format(name string, width int, height int, backdrop bool, opts ...OptionWatermark) OptionImage {
 	return func(o *optionsImage) {
 		imageFormat := format{
