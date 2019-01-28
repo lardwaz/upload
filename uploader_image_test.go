@@ -22,7 +22,6 @@ type imageUploadTest struct {
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	expectedProcessError bool
 	uploader             *ImageUploader
 }
 
@@ -44,13 +43,13 @@ func (s *UploaderTestSuite) SetupSuite() {
 
 	// Test cases
 	s.imageUploadTests = []imageUploadTest{
-		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, false, NewImageUploader(commonJPEG)},
-		{"Normal PNG", "normal.png", "normal_out.png", false, false, false, NewImageUploader(commonPNG)},
-		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, false, NewImageUploader(commonPNG)},
-		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, false, NewImageUploader(commonJPEG)},
-		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, false, NewImageUploader(commonPNG)},
-		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", false, false, false, NewImageUploader(commonJPEG)},
-		{"Damaged PNG", "damaged.png", "damaged_out.png", false, false, false, NewImageUploader(commonPNG)},
+		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, NewImageUploader(commonJPEG)},
+		{"Normal PNG", "normal.png", "normal_out.png", false, false, NewImageUploader(commonPNG)},
+		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, NewImageUploader(commonPNG)},
+		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, NewImageUploader(commonJPEG)},
+		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, NewImageUploader(commonPNG)},
+		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", false, false, NewImageUploader(commonJPEG)},
+		{"Damaged PNG", "damaged.png", "damaged_out.png", false, false, NewImageUploader(commonPNG)},
 	}
 }
 
