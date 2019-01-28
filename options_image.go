@@ -26,6 +26,7 @@ type optionsImage struct {
 	formats   []format
 }
 
+// EvaluateImageOptions returns optionsImage
 func EvaluateImageOptions(opts ...OptionImage) *optionsImage {
 	optCopy := &optionsImage{}
 	*optCopy = *defaultImageOptions

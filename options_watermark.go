@@ -12,6 +12,7 @@ type optionsWatermark struct {
 	offsetY    int
 }
 
+// EvaluateWatermarkOptions returns optionsWatermark
 func EvaluateWatermarkOptions(opts ...OptionWatermark) *optionsWatermark {
 	optCopy := &optionsWatermark{}
 	*optCopy = *defaultWatermarkOptions

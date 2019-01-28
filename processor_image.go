@@ -62,18 +62,12 @@ var (
 	CenterLeft = EvaluateWatermarkOptions(WatermarkHorizontal(Left), WatermarkVertical(Center))
 )
 type Job struct {
-	File UploadedFile
-	Config       *image.Config
+	File	UploadedFile
+	Config	*image.Config
 }
 
 type assetBoxer interface {
 	Open(string) (*os.File, error)
-}
-
-type ImageProcessor struct{
-	options *optionsImage
-	jobs chan Job
-	done chan string
 }
 
 func init() {
@@ -82,6 +76,29 @@ func init() {
 	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
 }
 
+// BackdropImage sets the disk path for backdrop images
+func BackdropImage(path string) {
+	_diskPathBackdrop = path
+}
+
+// WatermarkImage sets the disk path for watermark images
+func WatermarkImage(path string) {
+	_diskPathWatermark = path
+}
+
+// AssetBox sets the asset box to retrieve static assets
+func AssetBox(assetBox assetBoxer) {
+	_assetBox = assetBox
+}
+
+// ImageProcessor implements the processor interface
+type ImageProcessor struct{
+	options *optionsImage
+	jobs 	chan Job
+	done 	chan string
+}
+
+// NewImageProcessor returns a new ImageProcessor
 func NewImageProcessor(opts ...OptionImage) *ImageProcessor {
 	options := EvaluateImageOptions(opts...)
 	processor := &ImageProcessor{
@@ -127,8 +144,8 @@ func (p *ImageProcessor) Process(file UploadedFile, validate bool) error {
 	}
 
 	job := Job{
-		File: file,
-		Config:       &config,
+		File:	file,
+		Config:	&config,
 	}
 	p.jobs <- job
 
@@ -162,8 +179,6 @@ func (p *ImageProcessor) process(job Job) {
 		if format.name == "" || format.width <= 0 || format.height <= 0 {
 			continue
 		}
-
-		// imageProcess(job, format)
 
 		imgDiskPath := job.File.DiskPath()
 
