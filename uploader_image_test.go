@@ -34,8 +34,8 @@ func (s *UploaderTestSuite) SetupSuite() {
 	// Common upload configurations
 	common := []Option{
 		Dir(testFolder),
-		Destination("uploaded"),
-		MediaPrefixURL("/testdata/"),
+		Destination("tmp"),
+		MediaPrefixURL("/"+testFolder+"/"),
 		FileType(TypeImage),
 	}
 	commonJPEG := EvaluateOptions(append(common, ConvertTo(typeImageJPEG))...)

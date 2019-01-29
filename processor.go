@@ -2,5 +2,5 @@ package upload
 
 // Processor represents a file Processor (SMI)
 type Processor interface {
-	Process(string, []byte, ...Option) error
+	Process(string, []byte, ...Option) (*Job, error)
 }
