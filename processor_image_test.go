@@ -12,7 +12,7 @@ import (
 
 type imageProcessTest struct {
 	name                 string
-	outputFile			 string
+	expectedFile		 string
 	expectedProcessError bool
 	processor            *ImageProcessor
 }
@@ -76,8 +76,28 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 		case <-job.Done:
 			// Job done! We are good!
 		}
-
-
+		for _, format := range tt.processor.options.formats {
+			fileDiskPath := job.File.DiskPath()+":"+format.name
+			content, err := ioutil.ReadFile(fileDiskPath)
+			if err != nil {
+				s.FailNowf("Cannot open uploaded file", "Case: \"%s\". %s: %v", tt.name, fileDiskPath, err)
+			}
+	
+			expectedFileDiskPath := tt.expectedFile+":"+format.name
+			if *update {
+				if err = ioutil.WriteFile(filepath.Join(testFolder, expectedFileDiskPath), content, 0644); err != nil {
+					s.FailNowf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
+				}
+			}
+	
+			expectedContent, err := ioutil.ReadFile(filepath.Join(testFolder, expectedFileDiskPath))
+			if err != nil {
+				s.FailNowf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
+			}
+	
+			// Check if file content valid
+			s.Equalf(expectedContent, content, "Case: \"%s\". Uploaded content invalid", tt.name)
+		}
 	}
 }
 
