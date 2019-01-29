@@ -4,6 +4,7 @@ package upload
 import (
 	"path/filepath"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -54,6 +55,7 @@ func (s *ProcessorTestSuite) SetupSuite() {
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
 		{"Normal", "processed_normal_out.jpg", false, NewImageProcessor()},
+		{"Normal Thumb", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 400, 400, false))},
 	}
 }
 
@@ -64,14 +66,16 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 			// No problemo; we anticipated!
 			return
 		} else if err != nil {
-			s.FailNowf("Cannot process file", "Case: \"%s\": %v", tt.name, err)
+			s.Failf("Cannot process file", "Case: \"%s\": %v", tt.name, err)
+			continue
 		}
 
 		select {
 		case <-time.After(3 * time.Second):
 			// We timed out!
 			if !tt.expectedProcessError {
-				s.FailNowf("Cannot process file", "Case: \"%s\": Timed out!", tt.name)
+				s.Failf("Cannot process file", "Case: \"%s\": Timed out!", tt.name)
+				continue
 			}
 		case <-job.Done:
 			// Job done! We are good!
@@ -80,19 +84,29 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 			fileDiskPath := job.File.DiskPath()+":"+format.name
 			content, err := ioutil.ReadFile(fileDiskPath)
 			if err != nil {
-				s.FailNowf("Cannot open uploaded file", "Case: \"%s\". %s: %v", tt.name, fileDiskPath, err)
+				s.Failf("Cannot open processed file", "Case: \"%s\". %s: %v", tt.name, fileDiskPath, err)
+				continue
 			}
+
+			defer func(){
+				// Cleanup
+				if err = os.Remove(fileDiskPath); err != nil {
+					s.Failf("Cannot delete processed file", "Case: \"%s\". %s: %v", tt.name, fileDiskPath, err)
+				}
+			}()
 	
 			expectedFileDiskPath := tt.expectedFile+":"+format.name
 			if *update {
 				if err = ioutil.WriteFile(filepath.Join(testFolder, expectedFileDiskPath), content, 0644); err != nil {
-					s.FailNowf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
+					s.Failf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
+					continue
 				}
 			}
 	
 			expectedContent, err := ioutil.ReadFile(filepath.Join(testFolder, expectedFileDiskPath))
 			if err != nil {
-				s.FailNowf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
+				s.Failf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
+				continue
 			}
 	
 			// Check if file content valid
