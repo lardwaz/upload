@@ -57,7 +57,8 @@ func (s *UploaderTestSuite) TestImageUpload() {
 	for _, tt := range s.imageUploadTests {
 		inputContent, err := ioutil.ReadFile(filepath.Join(testFolder, tt.inputFile))
 		if err != nil {
-			s.FailNowf("Cannot open input golden file", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
+			s.Failf("Cannot open input golden file", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
+			continue
 		}
 
 		uploaded, err := tt.uploader.Upload(tt.inputFile, inputContent)
@@ -65,13 +66,14 @@ func (s *UploaderTestSuite) TestImageUpload() {
 			// No problemo; we anticipated!
 			return
 		} else if err != nil {
-			s.FailNowf("Cannot upload", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
+			s.Failf("Cannot upload", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
+			continue
 		}
 
 		defer func() {
 			// Cleanup
 			if err = uploaded.Delete(); err != nil {
-				s.FailNowf("Cannot delete uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
+				s.Failf("Cannot delete uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
 			}
 		}()
 
@@ -80,18 +82,21 @@ func (s *UploaderTestSuite) TestImageUpload() {
 			// No problemo; we anticipated!
 			return
 		} else if err != nil {
-			s.FailNowf("Cannot open uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
+			s.Failf("Cannot open uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
+			continue
 		}
 
 		if *update {
 			if err = ioutil.WriteFile(filepath.Join(testFolder, tt.expectedFile), content, 0644); err != nil {
-				s.FailNowf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
+				s.Failf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
+				continue
 			}
 		}
 
 		expectedContent, err := ioutil.ReadFile(filepath.Join(testFolder, tt.expectedFile))
 		if err != nil {
-			s.FailNowf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
+			s.Failf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
+			continue
 		}
 
 		// Check if file content valid
