@@ -4,7 +4,6 @@ package upload
 import (
 	"path/filepath"
 	"io/ioutil"
-	"log"
 	"testing"
 	"time"
 
@@ -78,7 +77,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 			// Job done! We are good!
 		}
 
-		
+
 	}
 }
 
