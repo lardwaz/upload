@@ -175,10 +175,10 @@ func (p *ImageProcessor) process(job *Job) {
 		newHeight := format.height
 
 		// Do not upscale
-		if job.Config.Width < format.width {
+		if format.width > job.Config.Width {
 			newWidth = job.Config.Width
 		}
-		if job.Config.Height < job.Config.Height {
+		if format.height > job.Config.Height {
 			newHeight = job.Config.Height
 		}
 
