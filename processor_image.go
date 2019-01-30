@@ -158,7 +158,7 @@ func (p *ImageProcessor) process(job *Job) {
 	)
 
 	for _, format := range p.options.formats {
-		if format.name == "" || format.width <= 0 || format.height <= 0 {
+		if format.name == "" || (format.width <= 0 && format.height <= 0) {
 			continue
 		}
 
@@ -180,6 +180,14 @@ func (p *ImageProcessor) process(job *Job) {
 		}
 		if format.height > job.Config.Height {
 			newHeight = job.Config.Height
+		}
+
+		// -1 pixel size does not exist
+		if format.width < 0 {
+			newWidth = 0
+		}
+		if format.height < 0 {
+			newHeight = 0
 		}
 
 		landscape := job.Config.Height < job.Config.Width
