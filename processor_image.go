@@ -192,7 +192,7 @@ func (p *ImageProcessor) process(job *Job) {
 			// Open a new image to use as backdrop layer
 			var back image.Image
 			if core.Env == core.EnvironmentDEV {
-				back, err = imaging.Open("../assets/" + _diskPathBackdrop)
+				back, err = imaging.Open(_diskPathBackdrop)
 			} else {
 				var staticAsset *os.File
 				staticAsset, err = _assetBox.Open(_diskPathBackdrop)
@@ -222,7 +222,7 @@ func (p *ImageProcessor) process(job *Job) {
 		if _diskPathWatermark != "" && format.watermark != nil {
 			var watermark image.Image
 			if core.Env == core.EnvironmentDEV {
-				watermark, err = imaging.Open("../assets/" + _diskPathWatermark + ":" + format.name)
+				watermark, err = imaging.Open(_diskPathWatermark + ":" + format.name)
 			} else {
 				var staticAsset *os.File
 				staticAsset, err = _assetBox.Open(_diskPathWatermark + ":" + format.name)

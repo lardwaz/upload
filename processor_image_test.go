@@ -50,12 +50,16 @@ func (s *ProcessorTestSuite) SetupSuite() {
 		s.FailNowf("Cannot upload", "Setup suite: %v", err)
 	}
 
-	// TODO: Set Watermark and backdrop assets
+	// Set Watermark and backdrop assets
+	WatermarkImage(filepath.Join(testFolder, "watermarks", "test-watermark.png"))
+	BackdropImage(filepath.Join(testFolder, "backdrops", "test-backdrop.jpg"))
 
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
 		{"Normal", "processed_normal_out.jpg", false, NewImageProcessor()},
 		{"Normal Thumb", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 400, 400, false))},
+		{"Watermark", "watermarked_normal_out.jpg", false, NewImageProcessor(Format("water", 400, 400, false, WatermarkHorizontal(Center), WatermarkVertical(Center)))},
+		{"Backdrop", "backdropped_normal_out.jpg", false, NewImageProcessor(Format("back", 400, 400, true))},
 	}
 }
 
@@ -91,7 +95,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 			defer func(){
 				// Cleanup
 				if err = os.Remove(fileDiskPath); err != nil {
-					s.Failf("Cannot delete processed file", "Case: \"%s\". %s: %v", tt.name, fileDiskPath, err)
+					// Not a problem!
 				}
 			}()
 	
@@ -118,7 +122,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 func (s *ProcessorTestSuite) TearDownSuite() {
 	// Cleanup
 	if err := s.uploadedFile.Delete(); err != nil {
-		s.Errorf(err, "Cannot delete uploaded file")
+		// Not a problem!
 	}
 }
 
