@@ -61,8 +61,10 @@ func (s *ProcessorTestSuite) SetupSuite() {
 		{"Normal Height Zero", "processed_normal_out.jpg", false, NewImageProcessor(Format("hzero", 200, 0, false))},
 		{"Normal Width Zero", "processed_normal_out.jpg", false, NewImageProcessor(Format("wzero", 0, 200, false))},
 		{"Normal Upscale", "processed_normal_out.jpg", false, NewImageProcessor(Format("upscale", 500, 500, false))},
+		{"Small Width", "processed_normal_out.jpg", true, NewImageProcessor(MinWidth(500))},
+		{"Small Height", "processed_normal_out.jpg", true, NewImageProcessor(MinHeight(500))},
 		{"Watermark", "watermarked_normal_out.jpg", false, NewImageProcessor(Format("water", 400, 400, false, WatermarkHorizontal(Center), WatermarkVertical(Center)))},
-		{"Backdrop", "backdropped_normal_out.jpg", false, NewImageProcessor(Format("back", 400, 400, true))},
+		{"Backdrop Landscape", "backdropped_normal_out.jpg", false, NewImageProcessor(Format("back", 200, 200, true))},
 	}
 }
 
@@ -71,7 +73,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 		job, err := tt.processor.Process(s.uploadedFile, true)
 		if tt.expectedProcessError && err != nil {
 			// No problemo; we anticipated!
-			return
+			continue
 		} else if err != nil {
 			s.Failf("Cannot process file", "Case: \"%s\": %v", tt.name, err)
 			continue
