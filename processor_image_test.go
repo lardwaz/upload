@@ -13,6 +13,7 @@ import (
 
 type imageProcessTest struct {
 	name                 string
+	inputFile 			 string
 	expectedFile		 string
 	expectedProcessError bool
 	processor            *ImageProcessor
@@ -20,57 +21,39 @@ type imageProcessTest struct {
 
 type ProcessorTestSuite struct {
 	suite.Suite
-	uploadedFile 	  Uploaded
 	imageProcessTests []imageProcessTest
 }
 
 func (s *ProcessorTestSuite) SetupSuite() {
-	const (
-		testImage = "normal.jpg"
-	)
-
-	inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, testImage))
-	if err != nil {
-		s.FailNowf("Cannot open input golden file", "Setup suite: %v", err)
-	}
-
-	// Common upload configurations
-	common := []Option{
-		Dir(testDataFolder),
-		Destination("tmp"),
-		MediaPrefixURL("/"+testDataFolder+"/"),
-		FileType(TypeImage),
-	}
-
-	commonOpts := EvaluateOptions(common...)
-	uploader := NewImageUploader(commonOpts)
-
-	s.uploadedFile, err = uploader.Upload(testImage, inputContent)
-	if err != nil {
-		s.FailNowf("Cannot upload", "Setup suite: %v", err)
-	}
-
 	// Set Watermark and backdrop assets
 	WatermarkImage(filepath.Join(testDataFolder, "watermarks", "test-watermark.png"))
 	BackdropImage(filepath.Join(testDataFolder, "backdrops", "test-backdrop.jpg"))
 
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
-		{"Normal", "processed_normal_out.jpg", false, NewImageProcessor()},
-		{"Normal Thumb", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 200, 200, false))},
-		{"Normal Height Zero", "processed_normal_out.jpg", false, NewImageProcessor(Format("hzero", 200, 0, false))},
-		{"Normal Width Zero", "processed_normal_out.jpg", false, NewImageProcessor(Format("wzero", 0, 200, false))},
-		{"Normal Upscale", "processed_normal_out.jpg", false, NewImageProcessor(Format("upscale", 500, 500, false))},
-		{"Small Width", "processed_normal_out.jpg", true, NewImageProcessor(MinWidth(500))},
-		{"Small Height", "processed_normal_out.jpg", true, NewImageProcessor(MinHeight(500))},
-		{"Watermark", "watermarked_normal_out.jpg", false, NewImageProcessor(Format("water", 400, 400, false, WatermarkHorizontal(Center), WatermarkVertical(Center)))},
-		{"Backdrop Landscape", "backdropped_normal_out.jpg", false, NewImageProcessor(Format("back", 200, 200, true))},
+		{"Normal", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor()},
+		{"Normal Thumb", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 200, 200, false))},
+		{"Normal Height Zero", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("hzero", 200, 0, false))},
+		{"Normal Width Zero", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("wzero", 0, 200, false))},
+		{"Normal Upscale", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("upscale", 500, 500, false))},
+		{"Small Width", "normal.jpg", "processed_normal_out.jpg", true, NewImageProcessor(MinWidth(500))},
+		{"Small Height", "normal.jpg", "processed_normal_out.jpg", true, NewImageProcessor(MinHeight(500))},
+		{"Watermark", "normal.jpg", "watermarked_normal_out.jpg", false, NewImageProcessor(Format("water", 400, 400, false, WatermarkHorizontal(Center), WatermarkVertical(Center)))},
+		{"Backdrop Landscape", "normal.jpg", "backdropped_normal_out.jpg", false, NewImageProcessor(Format("back", 200, 200, true))},
 	}
 }
 
 func (s *ProcessorTestSuite) TestImageProcess() {
+	// Common upload configurations
+	commonOpts := EvaluateOptions(
+		Dir(testDataFolder),
+		MediaPrefixURL("/"+testDataFolder+"/"),
+		FileType(TypeImage),
+	)
+
 	for _, tt := range s.imageProcessTests {
-		job, err := tt.processor.Process(s.uploadedFile, true)
+		uploadedFile := NewMockUploadedFile(tt.inputFile, *commonOpts)
+		job, err := tt.processor.Process(uploadedFile, true)
 		if tt.expectedProcessError && err != nil {
 			// No problemo; we anticipated!
 			continue
@@ -121,13 +104,6 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 			// Check if file content valid
 			s.Equalf(expectedContent, content, "Case: \"%s\". Uploaded content invalid", tt.name)
 		}
-	}
-}
-
-func (s *ProcessorTestSuite) TearDownSuite() {
-	// Cleanup
-	if err := s.uploadedFile.Delete(); err != nil {
-		// Not a problem!
 	}
 }
 
