@@ -31,8 +31,10 @@ func (s *ProcessorTestSuite) SetupSuite() {
 
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
-		{"Normal", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor()},
-		{"Normal Thumb", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 200, 200, false))},
+		{"Normal No Format", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor()},
+		{"Normal No Format PNG", "normal.png", "processed_normal_out.png", false, NewImageProcessor()},
+		{"Normal Format", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 200, 200, false))},
+		{"Normal Format PNG", "normal.png", "processed_normal_out.png", false, NewImageProcessor(Format("thumb", 200, 200, false))},
 		{"Normal Height Zero", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("hzero", 200, 0, false))},
 		{"Normal Width Zero", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("wzero", 0, 200, false))},
 		{"Normal Upscale", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("upscale", 500, 500, false))},
