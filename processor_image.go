@@ -191,6 +191,7 @@ func (p *ImageProcessor) process(job *Job) {
 		}
 
 		landscape := job.Config.Height < job.Config.Width
+		preserveAspect := newWidth <= 0 || newHeight <= 0
 
 		// Do not crop and resize when using backdrop but downscale
 		if _diskPathBackdrop != "" && format.backdrop && !landscape {
@@ -222,6 +223,9 @@ func (p *ImageProcessor) process(job *Job) {
 
 			// Overlay image in center on backdrop layer
 			img = imaging.OverlayCenter(back, img, 1.0)
+		} else if preserveAspect {
+			// Resize srcImage to proper width or height preserving the aspect ratio.
+			img = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
 		} else if _diskPathBackdrop != "" {
 			// Resize and crop the image to fill the [newWidth x newHeight] area
 			img = imaging.Fill(img, newWidth, newHeight, imaging.Center, imaging.Lanczos)
