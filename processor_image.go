@@ -43,23 +43,6 @@ var (
 
 	// _assetBox satisfies the AssetBoxer interface
 	_assetBox assetBoxer
-
-	// TopLeft is the top-left position for watermark
-	TopLeft = EvaluateWatermarkOptions(WatermarkHorizontal(Left), WatermarkVertical(Top))
-	// TopCenter is the top-center position for watermark
-	TopCenter = EvaluateWatermarkOptions(WatermarkHorizontal(Center), WatermarkVertical(Top))
-	// TopRight is the top-right position for watermark
-	TopRight = EvaluateWatermarkOptions(WatermarkHorizontal(Right), WatermarkVertical(Top))
-	// CenterRight is the center-right position for watermark
-	CenterRight = EvaluateWatermarkOptions(WatermarkHorizontal(Right), WatermarkVertical(Center))
-	// BottomRight is the bottom-right position for watermark
-	BottomRight = EvaluateWatermarkOptions(WatermarkHorizontal(Right), WatermarkVertical(Bottom))
-	// BottomCenter is the bottom-center position for watermark
-	BottomCenter = EvaluateWatermarkOptions(WatermarkHorizontal(Center), WatermarkVertical(Bottom))
-	// BottomLeft is the bottom-left position for watermark
-	BottomLeft = EvaluateWatermarkOptions(WatermarkHorizontal(Left), WatermarkVertical(Bottom))
-	// CenterLeft is the center-left position for watermark
-	CenterLeft = EvaluateWatermarkOptions(WatermarkHorizontal(Left), WatermarkVertical(Center))
 )
 
 // Job represents current image file being processed
