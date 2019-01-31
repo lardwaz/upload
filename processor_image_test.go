@@ -57,7 +57,9 @@ func (s *ProcessorTestSuite) SetupSuite() {
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
 		{"Normal", "processed_normal_out.jpg", false, NewImageProcessor()},
-		{"Normal Thumb", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 400, 400, false))},
+		{"Normal Thumb", "processed_normal_out.jpg", false, NewImageProcessor(Format("thumb", 200, 200, false))},
+		{"Normal Height Zero", "processed_normal_out.jpg", false, NewImageProcessor(Format("hzero", 200, 0, false))},
+		{"Normal Width Zero", "processed_normal_out.jpg", false, NewImageProcessor(Format("wzero", 0, 200, false))},
 		{"Watermark", "watermarked_normal_out.jpg", false, NewImageProcessor(Format("water", 400, 400, false, WatermarkHorizontal(Center), WatermarkVertical(Center)))},
 		{"Backdrop", "backdropped_normal_out.jpg", false, NewImageProcessor(Format("back", 400, 400, true))},
 	}
