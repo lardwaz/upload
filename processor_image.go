@@ -184,10 +184,10 @@ func (p *ImageProcessor) process(job *Job) {
 			// Open a new image to use as backdrop layer
 			var back image.Image
 			if core.Env == core.EnvironmentDEV {
-				back, err = imaging.Open(_diskPathBackdrop)
+				back, err = imaging.Open(_diskPathBackdrop + ":" + format.name)
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(_diskPathBackdrop)
+				staticAsset, err = _assetBox.Open(_diskPathBackdrop + ":" + format.name)
 				if err != nil {
 					// if err, fall back to a blue background backdrop
 					back = imaging.New(format.width, format.height, color.NRGBA{0, 29, 56, 0})

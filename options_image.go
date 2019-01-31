@@ -56,12 +56,19 @@ func MinHeight(d int) OptionImage {
 // Format returns a function to add Format option image
 func Format(name string, width int, height int, backdrop bool, opts ...OptionWatermark) OptionImage {
 	return func(o *optionsImage) {
+		var watermarkOpts *optionsWatermark
+		if len(opts) == 0 {
+			watermarkOpts = nil
+		} else {
+			watermarkOpts = EvaluateWatermarkOptions(opts...)
+		}
+
 		imageFormat := format{
 			name:      name,
 			width:     width,
 			height:    height,
 			backdrop:  backdrop,
-			watermark: EvaluateWatermarkOptions(opts...),
+			watermark: watermarkOpts,
 		}
 		o.formats = append(o.formats, imageFormat)
 	}

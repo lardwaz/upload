@@ -26,8 +26,8 @@ type ProcessorTestSuite struct {
 
 func (s *ProcessorTestSuite) SetupSuite() {
 	// Set Watermark and backdrop assets
-	WatermarkImage(filepath.Join(testDataFolder, "watermarks", "test-watermark.png"))
-	BackdropImage(filepath.Join(testDataFolder, "backdrops", "test-backdrop.jpg"))
+	WatermarkImage(filepath.Join(testDataFolder, "watermarks", "test_watermark.png"))
+	BackdropImage(filepath.Join(testDataFolder, "backdrops", "test_backdrop.jpg"))
 
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
@@ -38,8 +38,10 @@ func (s *ProcessorTestSuite) SetupSuite() {
 		{"Normal Upscale", "normal.jpg", "processed_normal_out.jpg", false, NewImageProcessor(Format("upscale", 500, 500, false))},
 		{"Small Width", "normal.jpg", "processed_normal_out.jpg", true, NewImageProcessor(MinWidth(500))},
 		{"Small Height", "normal.jpg", "processed_normal_out.jpg", true, NewImageProcessor(MinHeight(500))},
+		{"Invalid format", "damaged.jpg", "processed_normal_out.jpg", true, NewImageProcessor()},
 		{"Watermark", "normal.jpg", "watermarked_normal_out.jpg", false, NewImageProcessor(Format("water", 400, 400, false, WatermarkHorizontal(Center), WatermarkVertical(Center)))},
 		{"Backdrop Landscape", "normal.jpg", "backdropped_normal_out.jpg", false, NewImageProcessor(Format("back", 200, 200, true))},
+		{"Backdrop Portrait", "portrait.jpg", "backdropped_portrait_out.jpg", false, NewImageProcessor(Format("back", 200, 200, true))},
 	}
 }
 
