@@ -20,7 +20,7 @@ type imageProcessTest struct {
 
 type ProcessorTestSuite struct {
 	suite.Suite
-	uploadedFile 	  UploadedFile
+	uploadedFile 	  Uploaded
 	imageProcessTests []imageProcessTest
 }
 
@@ -29,16 +29,16 @@ func (s *ProcessorTestSuite) SetupSuite() {
 		testImage = "normal.jpg"
 	)
 
-	inputContent, err := ioutil.ReadFile(filepath.Join(testFolder, testImage))
+	inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, testImage))
 	if err != nil {
 		s.FailNowf("Cannot open input golden file", "Setup suite: %v", err)
 	}
 
 	// Common upload configurations
 	common := []Option{
-		Dir(testFolder),
+		Dir(testDataFolder),
 		Destination("tmp"),
-		MediaPrefixURL("/"+testFolder+"/"),
+		MediaPrefixURL("/"+testDataFolder+"/"),
 		FileType(TypeImage),
 	}
 
@@ -51,8 +51,8 @@ func (s *ProcessorTestSuite) SetupSuite() {
 	}
 
 	// Set Watermark and backdrop assets
-	WatermarkImage(filepath.Join(testFolder, "watermarks", "test-watermark.png"))
-	BackdropImage(filepath.Join(testFolder, "backdrops", "test-backdrop.jpg"))
+	WatermarkImage(filepath.Join(testDataFolder, "watermarks", "test-watermark.png"))
+	BackdropImage(filepath.Join(testDataFolder, "backdrops", "test-backdrop.jpg"))
 
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
@@ -106,13 +106,13 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 	
 			expectedFileDiskPath := tt.expectedFile+":"+format.name
 			if *update {
-				if err = ioutil.WriteFile(filepath.Join(testFolder, expectedFileDiskPath), content, 0644); err != nil {
+				if err = ioutil.WriteFile(filepath.Join(testDataFolder, expectedFileDiskPath), content, 0644); err != nil {
 					s.Failf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
 					continue
 				}
 			}
 	
-			expectedContent, err := ioutil.ReadFile(filepath.Join(testFolder, expectedFileDiskPath))
+			expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, expectedFileDiskPath))
 			if err != nil {
 				s.Failf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
 				continue

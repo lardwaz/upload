@@ -47,7 +47,7 @@ var (
 
 // Job represents current image file being processed
 type Job struct {
-	File	UploadedFile
+	File	Uploaded
 	Config	*image.Config
 	Done 	chan struct{}
 }
@@ -93,7 +93,7 @@ func NewImageProcessor(opts ...OptionImage) *ImageProcessor {
 }
 
 // Process adds a job to process an image based on specific options
-func (p *ImageProcessor) Process(file UploadedFile, validate bool) (*Job, error) {
+func (p *ImageProcessor) Process(file Uploaded, validate bool) (*Job, error) {
 	content := file.Content()
 	if !filetype.IsImage(content) {
 		return nil, fmt.Errorf("image type invalid")

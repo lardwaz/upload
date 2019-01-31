@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	testFolder = "testdata"
+	testDataFolder = "testdata"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -33,9 +33,9 @@ type UploaderTestSuite struct {
 func (s *UploaderTestSuite) SetupSuite() {
 	// Common upload configurations
 	common := []Option{
-		Dir(testFolder),
+		Dir(testDataFolder),
 		Destination("tmp"),
-		MediaPrefixURL("/"+testFolder+"/"),
+		MediaPrefixURL("/"+testDataFolder+"/"),
 		FileType(TypeImage),
 	}
 	commonJPEG := EvaluateOptions(append(common, ConvertTo(typeImageJPEG))...)
@@ -55,7 +55,7 @@ func (s *UploaderTestSuite) SetupSuite() {
 
 func (s *UploaderTestSuite) TestImageUpload() {
 	for _, tt := range s.imageUploadTests {
-		inputContent, err := ioutil.ReadFile(filepath.Join(testFolder, tt.inputFile))
+		inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
 		if err != nil {
 			s.Failf("Cannot open input golden file", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
 			continue
@@ -87,13 +87,13 @@ func (s *UploaderTestSuite) TestImageUpload() {
 		}
 
 		if *update {
-			if err = ioutil.WriteFile(filepath.Join(testFolder, tt.expectedFile), content, 0644); err != nil {
+			if err = ioutil.WriteFile(filepath.Join(testDataFolder, tt.expectedFile), content, 0644); err != nil {
 				s.Failf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
 				continue
 			}
 		}
 
-		expectedContent, err := ioutil.ReadFile(filepath.Join(testFolder, tt.expectedFile))
+		expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.expectedFile))
 		if err != nil {
 			s.Failf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
 			continue

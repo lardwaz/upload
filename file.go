@@ -19,9 +19,9 @@ type Uploaded interface {
 	URLPath() string
 	DiskPath() string
 	Content() []byte
-	Save(content []byte, overwrite bool) error
+	Save([]byte, bool) error
 	Delete() error
-	ChangeExt(newExt string) error
+	ChangeExt(string) error
 }
 
 // UploadedFile implements File interface
@@ -33,13 +33,13 @@ type UploadedFile struct {
 }
 
 // NewUploadedFile returns a new UploadedFile struct
-func NewUploadedFile(name string, opts options) UploadedFile {
+func NewUploadedFile(name string, opts options) *UploadedFile {
 	dirPath := path.Join(opts.dir, opts.destination)
 	name = AddTimestamp(name)
 	urlPath := path.Join(opts.mediaPrefixURL, opts.destination, name)
 	diskPath := filepath.Join(dirPath, name)
 
-	return UploadedFile{
+	return &UploadedFile{
 		url:      urlPath,
 		diskPath: diskPath,
 		options:  opts,

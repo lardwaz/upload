@@ -11,15 +11,15 @@ func NewImageUploader(common *options, opts ...OptionImage) *ImageUploader {
 	return &ImageUploader{options: common, processor: processor}
 }
 
-func (u *ImageUploader) Upload(name string, content []byte) (UploadedFile, error) {
+func (u *ImageUploader) Upload(name string, content []byte) (*UploadedFile, error) {
 	uploadedFile := NewUploadedFile(name, *u.options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
-		return uploadedFile, err
+		return nil, err
 	}
 
 	if err := uploadedFile.ChangeExt(u.options.convertTo); err != nil {
-		return uploadedFile, err
+		return nil, err
 	}
 
 	return uploadedFile, nil
