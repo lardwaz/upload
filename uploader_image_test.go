@@ -55,52 +55,54 @@ func (s *UploaderTestSuite) SetupSuite() {
 
 func (s *UploaderTestSuite) TestImageUpload() {
 	for _, tt := range s.imageUploadTests {
-		inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
-		if err != nil {
-			s.Failf("Cannot open input golden file", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
-			continue
-		}
-
-		uploaded, err := tt.uploader.Upload(tt.inputFile, inputContent)
-		if tt.expectedUploadError && err != nil {
-			// No problemo; we anticipated!
-			return
-		} else if err != nil {
-			s.Failf("Cannot upload", "Case: \"%s\". %s: %v", tt.name, tt.inputFile, err)
-			continue
-		}
-
-		defer func() {
-			// Cleanup
-			if err = uploaded.Delete(); err != nil {
-				s.Failf("Cannot delete uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
+		s.Run(tt.name, func(){
+			inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
+			if err != nil {
+				s.Failf("Cannot open input golden file", "%s: %v", tt.inputFile, err)
+				return
 			}
-		}()
 
-		content, err := ioutil.ReadFile(uploaded.DiskPath())
-		if tt.expectedContentError && err != nil {
-			// No problemo; we anticipated!
-			return
-		} else if err != nil {
-			s.Failf("Cannot open uploaded file", "Case: \"%s\". %s: %v", tt.name, uploaded.DiskPath(), err)
-			continue
-		}
-
-		if *update {
-			if err = ioutil.WriteFile(filepath.Join(testDataFolder, tt.expectedFile), content, 0644); err != nil {
-				s.Failf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
-				continue
+			uploaded, err := tt.uploader.Upload(tt.inputFile, inputContent)
+			if tt.expectedUploadError && err != nil {
+				// No problemo; we anticipated!
+				return
+			} else if err != nil {
+				s.Failf("Cannot upload", "%s: %v", tt.inputFile, err)
+				return
 			}
-		}
 
-		expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.expectedFile))
-		if err != nil {
-			s.Failf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, tt.expectedFile, err)
-			continue
-		}
+			defer func() {
+				// Cleanup
+				if err = uploaded.Delete(); err != nil {
+					s.Failf("Cannot delete uploaded file", "%s: %v", uploaded.DiskPath(), err)
+				}
+			}()
 
-		// Check if file content valid
-		s.Equalf(expectedContent, content, "Case: \"%s\". Uploaded content invalid", tt.name)
+			content, err := ioutil.ReadFile(uploaded.DiskPath())
+			if tt.expectedContentError && err != nil {
+				// No problemo; we anticipated!
+				return
+			} else if err != nil {
+				s.Failf("Cannot open uploaded file", "%s: %v", uploaded.DiskPath(), err)
+				return
+			}
+
+			if *update {
+				if err = ioutil.WriteFile(filepath.Join(testDataFolder, tt.expectedFile), content, 0644); err != nil {
+					s.Failf("Cannot update golden file", "%s: %v", tt.expectedFile, err)
+					return
+				}
+			}
+
+			expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.expectedFile))
+			if err != nil {
+				s.Failf("Cannot open output golden file", "%s: %v", tt.expectedFile, err)
+				return
+			}
+
+			// Check if file content valid
+			s.Equalf(expectedContent, content, "Uploaded content invalid")
+		})
 	}
 }
 
