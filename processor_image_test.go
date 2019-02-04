@@ -89,69 +89,71 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 	)
 
 	for _, tt := range s.imageProcessTests {
-		oldEnv := core.Env
-		// Adjust environment
-		defer func(){
-			core.Env = oldEnv
-		}()
-		if tt.prod {
-			core.Env = core.EnvironmentPROD
-		} else {
-			core.Env = core.EnvironmentDEV
-		}
-
-		uploadedFile := NewMockUploadedFile(tt.inputFile, *commonOpts)
-		job, err := tt.processor.Process(uploadedFile, true)
-		if tt.expectedProcessError && err != nil {
-			// No problemo; we anticipated!
-			continue
-		} else if err != nil {
-			s.Failf("Cannot process file", "Case: \"%s\": %v", tt.name, err)
-			continue
-		}
-
-		select {
-		case <-time.After(3 * time.Second):
-			// We timed out!
-			if !tt.expectedProcessError {
-				s.Failf("Cannot process file", "Case: \"%s\": Timed out!", tt.name)
-				continue
-			}
-		case <-job.Done:
-			// Job done! We are good!
-		}
-		for _, format := range tt.processor.options.formats {
-			fileDiskPath := job.File.DiskPath()+":"+format.name
-			content, err := ioutil.ReadFile(fileDiskPath)
-			if err != nil {
-				s.Failf("Cannot open processed file", "Case: \"%s\". %s: %v", tt.name, fileDiskPath, err)
-				continue
-			}
-
+		s.Run(tt.name, func(){
+			oldEnv := core.Env
+			// Adjust environment
 			defer func(){
-				// Cleanup
-				if err = os.Remove(fileDiskPath); err != nil {
-					// Not a problem!
-				}
+				core.Env = oldEnv
 			}()
+			if tt.prod {
+				core.Env = core.EnvironmentPROD
+			} else {
+				core.Env = core.EnvironmentDEV
+			}
 	
-			expectedFileDiskPath := tt.expectedFile+":"+format.name
-			if *update {
-				if err = ioutil.WriteFile(filepath.Join(testDataFolder, expectedFileDiskPath), content, 0644); err != nil {
-					s.Failf("Cannot update golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
+			uploadedFile := NewMockUploadedFile(tt.inputFile, *commonOpts)
+			job, err := tt.processor.Process(uploadedFile, true)
+			if tt.expectedProcessError && err != nil {
+				// No problemo; we anticipated!
+				return
+			} else if err != nil {
+				s.Failf("Cannot process file", "%v", err)
+				return
+			}
+	
+			select {
+			case <-time.After(3 * time.Second):
+				// We timed out!
+				if !tt.expectedProcessError {
+					s.Failf("Cannot process file", "Timed out!")
+					return
+				}
+			case <-job.Done:
+				// Job done! We are good!
+			}
+			for _, format := range tt.processor.options.formats {
+				fileDiskPath := job.File.DiskPath()+":"+format.name
+				content, err := ioutil.ReadFile(fileDiskPath)
+				if err != nil {
+					s.Failf("Cannot open processed file", "%s: %v", fileDiskPath, err)
+					return
+				}
+	
+				defer func(){
+					// Cleanup
+					if err = os.Remove(fileDiskPath); err != nil {
+						// Not a problem!
+					}
+				}()
+		
+				expectedFileDiskPath := tt.expectedFile+":"+format.name
+				if *update {
+					if err = ioutil.WriteFile(filepath.Join(testDataFolder, expectedFileDiskPath), content, 0644); err != nil {
+						s.Failf("Cannot update golden file", "%s: %v", expectedFileDiskPath, err)
+						continue
+					}
+				}
+		
+				expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, expectedFileDiskPath))
+				if err != nil {
+					s.Failf("Cannot open output golden file", "%s: %v", expectedFileDiskPath, err)
 					continue
 				}
+		
+				// Check if file content valid
+				s.Equalf(expectedContent, content, "Uploaded content invalid")
 			}
-	
-			expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, expectedFileDiskPath))
-			if err != nil {
-				s.Failf("Cannot open output golden file", "Case: \"%s\". %s: %v", tt.name, expectedFileDiskPath, err)
-				continue
-			}
-	
-			// Check if file content valid
-			s.Equalf(expectedContent, content, "Case: \"%s\". Uploaded content invalid", tt.name)
-		}
+		})
 	}
 }
 
