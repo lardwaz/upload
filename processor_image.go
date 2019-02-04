@@ -141,7 +141,7 @@ func (p *ImageProcessor) process(job *Job) {
 	)
 
 	for _, format := range p.options.formats {
-		if format.name == "" || (format.width <= 0 && format.height <= 0) {
+		if format.name == "" {
 			continue
 		}
 
