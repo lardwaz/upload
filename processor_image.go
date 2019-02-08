@@ -17,12 +17,12 @@ import (
 )
 
 const (
-	// typeImageJPG denotes image of file type jpg
-	typeImageJPG = "jpg"
-	// typeImageJPEG denotes image of file type jpeg
-	typeImageJPEG = "jpeg"
-	// typeImagePNG denotes image of file type png
-	typeImagePNG = "png"
+	// TypeImageJPG denotes image of file type jpg
+	TypeImageJPG = "jpg"
+	// TypeImageJPEG denotes image of file type jpeg
+	TypeImageJPEG = "jpeg"
+	// TypeImagePNG denotes image of file type png
+	TypeImagePNG = "png"
 
 	chanSize = 10
 )
@@ -79,7 +79,7 @@ func AssetBox(assetBox assetBoxer) {
 
 // ImageProcessor implements the processor interface
 type ImageProcessor struct{
-	options *optionsImage
+	options *OptionsImage
 }
 
 // NewImageProcessor returns a new ImageProcessor
@@ -90,6 +90,11 @@ func NewImageProcessor(opts ...OptionImage) *ImageProcessor {
 	}
 
 	return processor
+}
+
+// Options returns OptionsImage
+func (p ImageProcessor) Options() OptionsImage {
+	return *p.options
 }
 
 // Process adds a job to process an image based on specific options
@@ -106,7 +111,7 @@ func (p *ImageProcessor) Process(file Uploaded, validate bool) (*Job, error) {
 	}
 
 	switch imgType {
-	case typeImageJPG, typeImageJPEG, typeImagePNG:
+	case TypeImageJPG, TypeImageJPEG, TypeImagePNG:
 		//all ok
 	default:
 		return nil, fmt.Errorf("image type %s invalid", imgType)

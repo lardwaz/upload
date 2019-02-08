@@ -1,11 +1,11 @@
 package upload
 
 type VideoUpload struct {
-	fileOpts  options
+	fileOpts  Options
 	videoOpts optionsVideo
 }
 
-func NewVideoUploader(common options, opts ...OptionVideo) VideoUpload {
+func NewVideoUploader(common Options, opts ...OptionVideo) VideoUpload {
 	options := EvaluateVideoOptions(opts)
 	return VideoUpload{fileOpts: common, videoOpts: *options}
 }

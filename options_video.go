@@ -11,7 +11,7 @@ const (
 )
 
 type optionsVideo struct {
-	options
+	Options
 	codec int
 }
 

@@ -1,4 +1,4 @@
-package upload
+package upload_test
 
 // Basic imports
 import (
@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"github.com/lsldigital/gocipe-upload"
+
 )
 
 const (
@@ -22,7 +24,7 @@ type imageUploadTest struct {
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	uploader             *ImageUploader
+	uploader             *upload.ImageUploader
 }
 
 type UploaderTestSuite struct {
@@ -32,24 +34,24 @@ type UploaderTestSuite struct {
 
 func (s *UploaderTestSuite) SetupSuite() {
 	// Common upload configurations
-	common := []Option{
-		Dir(testDataFolder),
-		Destination("tmp"),
-		MediaPrefixURL("/"+testDataFolder+"/"),
-		FileType(TypeImage),
+	common := []upload.Option{
+		upload.Dir(testDataFolder),
+		upload.Destination("tmp"),
+		upload.MediaPrefixURL("/"+testDataFolder+"/"),
+		upload.FileType(upload.TypeImage),
 	}
-	commonJPEG := EvaluateOptions(append(common, ConvertTo(typeImageJPEG))...)
-	commonPNG := EvaluateOptions(append(common, ConvertTo(typeImagePNG))...)
+	commonJPEG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeImageJPEG))...)
+	commonPNG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeImagePNG))...)
 
 	// Test cases
 	s.imageUploadTests = []imageUploadTest{
-		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, NewImageUploader(commonJPEG)},
-		{"Normal PNG", "normal.png", "normal_out.png", false, false, NewImageUploader(commonPNG)},
-		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, NewImageUploader(commonPNG)},
-		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, NewImageUploader(commonJPEG)},
-		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, NewImageUploader(commonPNG)},
-		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", false, false, NewImageUploader(commonJPEG)},
-		{"Damaged PNG", "damaged.png", "damaged_out.png", false, false, NewImageUploader(commonPNG)},
+		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, upload.NewImageUploader(commonJPEG)},
+		{"Normal PNG", "normal.png", "normal_out.png", false, false, upload.NewImageUploader(commonPNG)},
+		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, upload.NewImageUploader(commonPNG)},
+		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, upload.NewImageUploader(commonJPEG)},
+		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, upload.NewImageUploader(commonPNG)},
+		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", false, false, upload.NewImageUploader(commonJPEG)},
+		{"Damaged PNG", "damaged.png", "damaged_out.png", false, false, upload.NewImageUploader(commonPNG)},
 	}
 }
 

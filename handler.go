@@ -11,14 +11,14 @@ import (
 type httpImageDirHandler struct {
 	root   http.FileSystem
 	prefix string
-	opts   *optionsImage
+	opts   *OptionsImage
 }
 
 func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := r.URL.Path
 
 	var suffix string
-	for _, format := range s.opts.formats {
+	for _, format := range s.opts.Formats() {
 		formatSuffix := ":" + format.name
 		if strings.HasSuffix(p, formatSuffix) {
 			suffix = formatSuffix

@@ -1,12 +1,12 @@
 package upload
 
 type ImageUploader struct {
-	options  *options
+	options  *Options
 	processor *ImageProcessor
 }
 
 // NewImageUploader returns ImageUploader
-func NewImageUploader(common *options, opts ...OptionImage) *ImageUploader {
+func NewImageUploader(common *Options, opts ...OptionImage) *ImageUploader {
 	processor := NewImageProcessor(opts...)
 	return &ImageUploader{options: common, processor: processor}
 }

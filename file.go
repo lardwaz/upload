@@ -29,11 +29,11 @@ type UploadedFile struct {
 	url      string
 	diskPath string
 	content  []byte
-	options  options
+	options  Options
 }
 
 // NewUploadedFile returns a new UploadedFile struct
-func NewUploadedFile(name string, opts options) *UploadedFile {
+func NewUploadedFile(name string, opts Options) *UploadedFile {
 	dirPath := path.Join(opts.dir, opts.destination)
 	name = AddTimestamp(name)
 	urlPath := path.Join(opts.mediaPrefixURL, opts.destination, name)
