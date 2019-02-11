@@ -34,9 +34,9 @@ type UploadedFile struct {
 
 // NewUploadedFile returns a new UploadedFile struct
 func NewUploadedFile(name string, opts Options) *UploadedFile {
-	dirPath := path.Join(opts.dir, opts.destination)
+	dirPath := path.Join(opts.Dir(), opts.Destination())
 	name = AddTimestamp(name)
-	urlPath := path.Join(opts.mediaPrefixURL, opts.destination, name)
+	urlPath := path.Join(opts.MediaPrefixURL(), opts.Destination(), name)
 	currentTime := time.Now() 
 	diskPath := filepath.Join(dirPath, fmt.Sprintf("%d", currentTime.Year()), fmt.Sprintf("%v", currentTime.Month()), name)
 
