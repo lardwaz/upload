@@ -8,7 +8,7 @@ var (
 	defaultOptions = &Options{
 		dir:            "media",
 		mediaPrefixURL: "/media/",
-		fileType:       TypeImage,
+		fileType:       []Type{TypeImage},
 		maxSize:        core.NoLimit,
 		convertTo:      TypeImageJPG,
 	}
@@ -19,7 +19,7 @@ type Options struct {
 	dir            string
 	destination    string
 	mediaPrefixURL string
-	fileType       uint8
+	fileType       []Type
 	maxSize        int
 	convertTo      string
 }
@@ -40,7 +40,7 @@ func(o Options) MediaPrefixURL() string {
 }
 
 // FileType returns FileType
-func(o Options) FileType() uint8 {
+func(o Options) FileType() []Type {
 	return o.fileType
 }
 
@@ -52,6 +52,27 @@ func(o Options) MaxSize() int {
 // ConvertTo returns ConvertTo
 func(o Options) ConvertTo() string {
 	return o.convertTo
+}
+
+// FileTypeValid checks if filetype valid
+func(o Options) FileTypeValid(t Type) bool {
+	switch t {
+	case TypeImage, TypeVideo, TypeAudio, TypeDocument, TypeSheet, TypeCSV, TypePDF:
+		return true
+	}
+
+	return false
+}
+
+// FileTypeExist checks if filetype exists
+func(o Options) FileTypeExist(t Type) bool {
+	for _, fileType := range o.fileType {
+		if fileType == t {
+			return true
+		}
+	}
+
+	return false
 }
 
 // EvaluateOptions returns list of options
@@ -89,9 +110,11 @@ func MediaPrefixURL(u string) Option {
 }
 
 // FileType returns a function to change FileType
-func FileType(t uint8) Option {
+func FileType(t Type) Option {
 	return func(o *Options) {
-		o.fileType = t
+		if o.FileTypeValid(t) && !o.FileTypeExist(t) {
+			o.fileType = append(o.fileType, t)
+		}
 	}
 }
 

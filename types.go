@@ -2,7 +2,7 @@ package upload
 
 // Supported file types by file upload
 const (
-	TypeInvalid uint8 = iota
+	TypeInvalid Type = iota
 	TypeImage
 	TypeVideo
 	TypeAudio
@@ -11,3 +11,6 @@ const (
 	TypeCSV
 	TypePDF
 )
+
+// Type represents a filetype
+type Type uint8
