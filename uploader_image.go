@@ -2,6 +2,7 @@ package upload
 
 import (
 	"fmt"
+	"github.com/h2non/filetype"
 )
 
 // ImageUploader is an image uploader
@@ -28,7 +29,13 @@ func (u *ImageUploader) Upload(name string, content []byte) (*UploadedFile, erro
 		return nil, err
 	}
 
-	if err := uploadedFile.ChangeExt(u.Options.ConvertTo()); err != nil {
+	fileType, err := filetype.MatchFile(uploadedFile.DiskPath())
+	if err != nil {
+		return nil, fmt.Errorf("Error retrieving file type: %v", err)
+	}
+
+	newType := u.Options.ConvertTo(fileType)
+	if err := uploadedFile.ChangeExt(newType.Extension); err != nil {
 		return nil, err
 	}
 

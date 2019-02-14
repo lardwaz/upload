@@ -39,9 +39,12 @@ func (s *GenericUploaderTestSuite) SetupSuite() {
 
 	commonOpts := upload.EvaluateOptions(common...)
 	commonMaxSizeOpts := upload.EvaluateOptions(append(common, upload.MaxSize(300))...)
+	commonPDFMP3Opts := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypePDF, upload.TypeMP3))...)
 
 	// Test cases
 	s.genericUploadTests = []genericUploadTest{
+		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(commonOpts)},
+		{"PDF to MP3", "normal.pdf", "normal_convert_out.mp3", false, false, upload.NewGenericUploader(commonPDFMP3Opts)},
 		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(commonOpts)},
 		{"MP3", "normal.mp3", "normal_out.mp3", false, false, upload.NewGenericUploader(commonOpts)},
 		{"MP4", "normal.mp4", "normal_out.mp4", false, false, upload.NewGenericUploader(commonOpts)},

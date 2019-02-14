@@ -44,8 +44,8 @@ func (s *ImageUploaderTestSuite) SetupSuite() {
 		upload.FileType(upload.TypeGIF),
 		upload.FileType(upload.TypeHEIF),
 	}
-	commonJPEG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeImageJPEG))...)
-	commonPNG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeImagePNG))...)
+	commonJPEG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeJPEG, upload.TypeJPEG))...)
+	commonPNG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypePNG, upload.TypePNG))...)
 	commonMaxSizeOpts := upload.EvaluateOptions(append(common, upload.MaxSize(20))...)
 
 	// Test cases

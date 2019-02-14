@@ -10,6 +10,7 @@ var (
 		dir:            "media",
 		mediaPrefixURL: "/media/",
 		maxSize:        core.NoLimit,
+		convertTo: 		make(map[types.Type]types.Type),
 	}
 )
 
@@ -20,7 +21,7 @@ type Options struct {
 	mediaPrefixURL string
 	fileType       []types.Type
 	maxSize        int
-	convertTo      string
+	convertTo      map[types.Type]types.Type
 }
 
 // Dir returns Dir
@@ -49,8 +50,8 @@ func(o Options) MaxSize() int {
 }
 
 // ConvertTo returns ConvertTo
-func(o Options) ConvertTo() string {
-	return o.convertTo
+func(o Options) ConvertTo(t types.Type) types.Type {
+	return o.convertTo[t]
 }
 
 // FileTypeExist checks if filetype exists
@@ -115,8 +116,8 @@ func MaxSize(s int) Option {
 }
 
 // ConvertTo returns a function to change ConvertTo
-func ConvertTo(t string) Option {
+func ConvertTo(oldType, newType types.Type) Option {
 	return func(o *Options) {
-		o.convertTo = t
+		o.convertTo[oldType] = newType
 	}
 }

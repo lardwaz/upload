@@ -34,7 +34,8 @@ func (u *GenericUploader) Upload(name string, content []byte) (*UploadedFile, er
 		return nil, err
 	}
 
-	if err := uploadedFile.ChangeExt(u.Options.ConvertTo()); err != nil {
+	newType := u.Options.ConvertTo(fileType)
+	if err := uploadedFile.ChangeExt(newType.Extension); err != nil {
 		return nil, err
 	}
 
