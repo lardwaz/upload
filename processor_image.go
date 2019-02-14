@@ -13,7 +13,6 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/lsldigital/gocipe-upload/core"
-	filetype "gopkg.in/h2non/filetype.v1"
 )
 
 const (
@@ -23,8 +22,6 @@ const (
 	TypeImageJPEG = "jpeg"
 	// TypeImagePNG denotes image of file type png
 	TypeImagePNG = "png"
-
-	chanSize = 10
 )
 
 // Anchor points for X,Y
@@ -100,21 +97,14 @@ func (p ImageProcessor) Options() OptionsImage {
 // Process adds a job to process an image based on specific options
 func (p *ImageProcessor) Process(file Uploaded, validate bool) (*Job, error) {
 	content := file.Content()
-	if !filetype.IsImage(content) {
+	if !isValidImage(content) {
 		return nil, fmt.Errorf("image type invalid")
 	}
 
-	config, imgType, err := image.DecodeConfig(bytes.NewReader(content))
+	config, _, err := image.DecodeConfig(bytes.NewReader(content))
 	if err != nil {
 		log.Printf("error decoding image: %v", err)
 		return nil, err
-	}
-
-	switch imgType {
-	case TypeImageJPG, TypeImageJPEG, TypeImagePNG:
-		//all ok
-	default:
-		return nil, fmt.Errorf("image type %s invalid", imgType)
 	}
 
 	// Check min width and height

@@ -2,7 +2,6 @@ package upload_test
 
 // Basic imports
 import (
-	"flag"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -12,57 +11,51 @@ import (
 
 )
 
-const (
-	testDataFolder = "testdata"
-)
-
-var update = flag.Bool("update", false, "update golden files")
-
-type imageUploadTest struct {
+type genericUploadTest struct {
 	name                 string
 	inputFile            string
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	uploader             *upload.ImageUploader
+	uploader             *upload.GenericUploader
 }
 
-type ImageUploaderTestSuite struct {
+type GenericUploaderTestSuite struct {
 	suite.Suite
-	imageUploadTests []imageUploadTest
+	genericUploadTests []genericUploadTest
 }
 
-func (s *ImageUploaderTestSuite) SetupSuite() {
+func (s *GenericUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
 	common := []upload.Option{
 		upload.Dir(testDataFolder),
 		upload.Destination("tmp"),
 		upload.MediaPrefixURL("/"+testDataFolder+"/"),
-		upload.FileType(upload.TypeJPEG),
-		upload.FileType(upload.TypeJPEG2),
-		upload.FileType(upload.TypePNG),
-		upload.FileType(upload.TypeGIF),
-		upload.FileType(upload.TypeHEIF),
+		upload.FileType(upload.TypePDF),
+		upload.FileType(upload.TypeMP3),
+		upload.FileType(upload.TypeMP4),
+		upload.FileType(upload.TypeZIP),
 	}
-	commonJPEG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeImageJPEG))...)
-	commonPNG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeImagePNG))...)
-	commonMaxSizeOpts := upload.EvaluateOptions(append(common, upload.MaxSize(20))...)
+
+	commonOpts := upload.EvaluateOptions(common...)
+	commonMaxSizeOpts := upload.EvaluateOptions(append(common, upload.MaxSize(300))...)
 
 	// Test cases
-	s.imageUploadTests = []imageUploadTest{
-		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, upload.NewImageUploader(commonJPEG)},
-		{"Normal PNG", "normal.png", "normal_out.png", false, false, upload.NewImageUploader(commonPNG)},
-		{"Max Size PNG", "normal.png", "normal_out.png", true, false, upload.NewImageUploader(commonMaxSizeOpts)},
-		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, upload.NewImageUploader(commonPNG)},
-		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, upload.NewImageUploader(commonJPEG)},
-		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, upload.NewImageUploader(commonPNG)},
-		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", true, false, upload.NewImageUploader(commonJPEG)},
-		{"Damaged PNG", "damaged.png", "damaged_out.png", true, false, upload.NewImageUploader(commonPNG)},
+	s.genericUploadTests = []genericUploadTest{
+		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(commonOpts)},
+		{"MP3", "normal.mp3", "normal_out.mp3", false, false, upload.NewGenericUploader(commonOpts)},
+		{"MP4", "normal.mp4", "normal_out.mp4", false, false, upload.NewGenericUploader(commonOpts)},
+		{"ZIP", "normal.zip", "normal_out.zip", false, false, upload.NewGenericUploader(commonOpts)},
+		{"ZIP (Max Size)", "normal.zip", "normal_out.zip", true, false, upload.NewGenericUploader(commonMaxSizeOpts)},
+		{"TXT (invalid)", "normal.txt", "normal_out.txt", true, false, upload.NewGenericUploader(commonOpts)},
+		{"JS (invalid)", "normal.js", "normal_out.js", true, false, upload.NewGenericUploader(commonOpts)},
+		{"PHP (invalid)", "normal.php", "normal_out.php", true, false, upload.NewGenericUploader(commonOpts)},
+		{"JPG (invalid + damaged)", "damaged.jpg", "damaged_out.php", true, false, upload.NewGenericUploader(commonOpts)},
 	}
 }
 
-func (s *ImageUploaderTestSuite) TestImageUpload() {
-	for _, tt := range s.imageUploadTests {
+func (s *GenericUploaderTestSuite) TestGenericUpload() {
+	for _, tt := range s.genericUploadTests {
 		s.Run(tt.name, func(){
 			inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
 			if err != nil {
@@ -114,6 +107,6 @@ func (s *ImageUploaderTestSuite) TestImageUpload() {
 	}
 }
 
-func TestImageUploaderTestSuite(t *testing.T) {
-	suite.Run(t, new(ImageUploaderTestSuite))
+func TestGenericUploaderTestSuite(t *testing.T) {
+	suite.Run(t, new(GenericUploaderTestSuite))
 }

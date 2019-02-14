@@ -86,7 +86,11 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 	commonOpts := upload.EvaluateOptions(
 		upload.Dir(testDataFolder),
 		upload.MediaPrefixURL("/"+testDataFolder+"/"),
-		upload.FileType(upload.TypeImage),
+		upload.FileType(upload.TypeJPEG),
+		upload.FileType(upload.TypeJPEG2),
+		upload.FileType(upload.TypePNG),
+		upload.FileType(upload.TypeGIF),
+		upload.FileType(upload.TypeHEIF),
 	)
 
 	for _, tt := range s.imageProcessTests {

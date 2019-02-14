@@ -2,15 +2,14 @@ package upload
 
 import (
 	"github.com/lsldigital/gocipe-upload/core"
+	"github.com/h2non/filetype/types"
 )
 
 var (
 	defaultOptions = &Options{
 		dir:            "media",
 		mediaPrefixURL: "/media/",
-		fileType:       []Type{TypeImage},
 		maxSize:        core.NoLimit,
-		convertTo:      TypeImageJPG,
 	}
 )
 
@@ -19,7 +18,7 @@ type Options struct {
 	dir            string
 	destination    string
 	mediaPrefixURL string
-	fileType       []Type
+	fileType       []types.Type
 	maxSize        int
 	convertTo      string
 }
@@ -40,7 +39,7 @@ func(o Options) MediaPrefixURL() string {
 }
 
 // FileType returns FileType
-func(o Options) FileType() []Type {
+func(o Options) FileType() []types.Type {
 	return o.fileType
 }
 
@@ -54,18 +53,8 @@ func(o Options) ConvertTo() string {
 	return o.convertTo
 }
 
-// FileTypeValid checks if filetype valid
-func(o Options) FileTypeValid(t Type) bool {
-	switch t {
-	case TypeImage, TypeVideo, TypeAudio, TypeDocument, TypeSheet, TypeCSV, TypePDF:
-		return true
-	}
-
-	return false
-}
-
 // FileTypeExist checks if filetype exists
-func(o Options) FileTypeExist(t Type) bool {
+func(o Options) FileTypeExist(t types.Type) bool {
 	for _, fileType := range o.fileType {
 		if fileType == t {
 			return true
@@ -110,9 +99,9 @@ func MediaPrefixURL(u string) Option {
 }
 
 // FileType returns a function to change FileType
-func FileType(t Type) Option {
+func FileType(t types.Type) Option {
 	return func(o *Options) {
-		if o.FileTypeValid(t) && !o.FileTypeExist(t) {
+		if isValidType(t) && !o.FileTypeExist(t) {
 			o.fileType = append(o.fileType, t)
 		}
 	}

@@ -1,5 +1,10 @@
 package upload
 
+import (
+	"fmt"
+)
+
+// ImageUploader is an image uploader
 type ImageUploader struct {
 	Options  *Options
 	Processor *ImageProcessor
@@ -11,7 +16,12 @@ func NewImageUploader(common *Options, opts ...OptionImage) *ImageUploader {
 	return &ImageUploader{Options: common, Processor: processor}
 }
 
+// Upload method to satisfy uploader interface
 func (u *ImageUploader) Upload(name string, content []byte) (*UploadedFile, error) {
+	if !isValidImage(content) {
+		return nil, fmt.Errorf("Not a valid image")
+	}
+
 	uploadedFile := NewUploadedFile(name, *u.Options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
