@@ -13,18 +13,15 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/lsldigital/gocipe-upload/core"
-	filetype "gopkg.in/h2non/filetype.v1"
 )
 
 const (
-	// typeImageJPG denotes image of file type jpg
-	typeImageJPG = "jpg"
-	// typeImageJPEG denotes image of file type jpeg
-	typeImageJPEG = "jpeg"
-	// typeImagePNG denotes image of file type png
-	typeImagePNG = "png"
-
-	chanSize = 10
+	// TypeImageJPG denotes image of file type jpg
+	TypeImageJPG = "jpg"
+	// TypeImageJPEG denotes image of file type jpeg
+	TypeImageJPEG = "jpeg"
+	// TypeImagePNG denotes image of file type png
+	TypeImagePNG = "png"
 )
 
 // Anchor points for X,Y
@@ -79,7 +76,7 @@ func AssetBox(assetBox assetBoxer) {
 
 // ImageProcessor implements the processor interface
 type ImageProcessor struct{
-	options *optionsImage
+	options *OptionsImage
 }
 
 // NewImageProcessor returns a new ImageProcessor
@@ -92,24 +89,22 @@ func NewImageProcessor(opts ...OptionImage) *ImageProcessor {
 	return processor
 }
 
+// Options returns OptionsImage
+func (p ImageProcessor) Options() OptionsImage {
+	return *p.options
+}
+
 // Process adds a job to process an image based on specific options
 func (p *ImageProcessor) Process(file Uploaded, validate bool) (*Job, error) {
 	content := file.Content()
-	if !filetype.IsImage(content) {
+	if !isValidImage(content) {
 		return nil, fmt.Errorf("image type invalid")
 	}
 
-	config, imgType, err := image.DecodeConfig(bytes.NewReader(content))
+	config, _, err := image.DecodeConfig(bytes.NewReader(content))
 	if err != nil {
 		log.Printf("error decoding image: %v", err)
 		return nil, err
-	}
-
-	switch imgType {
-	case typeImageJPG, typeImageJPEG, typeImagePNG:
-		//all ok
-	default:
-		return nil, fmt.Errorf("image type %s invalid", imgType)
 	}
 
 	// Check min width and height

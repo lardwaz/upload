@@ -1,24 +1,41 @@
 package upload
 
+import (
+	"fmt"
+	"github.com/h2non/filetype"
+)
+
+// ImageUploader is an image uploader
 type ImageUploader struct {
-	options  *options
-	processor *ImageProcessor
+	Options  *Options
+	Processor *ImageProcessor
 }
 
 // NewImageUploader returns ImageUploader
-func NewImageUploader(common *options, opts ...OptionImage) *ImageUploader {
+func NewImageUploader(common *Options, opts ...OptionImage) *ImageUploader {
 	processor := NewImageProcessor(opts...)
-	return &ImageUploader{options: common, processor: processor}
+	return &ImageUploader{Options: common, Processor: processor}
 }
 
+// Upload method to satisfy uploader interface
 func (u *ImageUploader) Upload(name string, content []byte) (*UploadedFile, error) {
-	uploadedFile := NewUploadedFile(name, *u.options)
+	if !isValidImage(content) {
+		return nil, fmt.Errorf("Not a valid image")
+	}
+
+	uploadedFile := NewUploadedFile(name, *u.Options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
 		return nil, err
 	}
 
-	if err := uploadedFile.ChangeExt(u.options.convertTo); err != nil {
+	fileType, err := filetype.MatchFile(uploadedFile.DiskPath())
+	if err != nil {
+		return nil, fmt.Errorf("Error retrieving file type: %v", err)
+	}
+
+	newType := u.Options.ConvertTo(fileType)
+	if err := uploadedFile.ChangeExt(newType.Extension); err != nil {
 		return nil, err
 	}
 
