@@ -1,4 +1,4 @@
-module github.com/lsldigital/gocipe-upload
+module go.lsl.digital/gocipe/upload
 
 require (
 	github.com/disintegration/imaging v1.5.0

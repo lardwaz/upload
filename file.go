@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
-	"github.com/lsldigital/gocipe-upload/core"
+	"go.lsl.digital/gocipe/upload/core"
 )
 
 // Uploaded represents the uploaded file

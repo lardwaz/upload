@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"github.com/lsldigital/gocipe-upload"
+	"go.lsl.digital/gocipe/upload"
 
 )
 

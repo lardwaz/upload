@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/disintegration/imaging"
-	"github.com/lsldigital/gocipe-upload/core"
+	"go.lsl.digital/gocipe/upload/core"
 )
 
 const (
