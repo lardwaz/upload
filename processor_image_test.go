@@ -2,15 +2,15 @@ package upload_test
 
 // Basic imports
 import (
-	"path/filepath"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	"go.lsl.digital/gocipe/upload/core"
 	"go.lsl.digital/gocipe/upload"
+	"go.lsl.digital/gocipe/upload/core"
 )
 
 type mockAssetBoxer struct{}
@@ -25,9 +25,9 @@ func (m *mockAssetBoxer) Open(name string) (*os.File, error) {
 
 type imageProcessTest struct {
 	name                 string
-	prod 				 bool
-	inputFile 			 string
-	expectedFile		 string
+	prod                 bool
+	inputFile            string
+	expectedFile         string
 	expectedProcessError bool
 	processor            *upload.ImageProcessor
 }
@@ -94,10 +94,10 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 	)
 
 	for _, tt := range s.imageProcessTests {
-		s.Run(tt.name, func(){
+		s.Run(tt.name, func() {
 			oldEnv := core.Env
 			// Adjust environment
-			defer func(){
+			defer func() {
 				core.Env = oldEnv
 			}()
 			if tt.prod {
@@ -105,7 +105,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 			} else {
 				core.Env = core.EnvironmentDEV
 			}
-	
+
 			uploadedFile := upload.NewMockUploadedFile(tt.inputFile, *commonOpts)
 			job, err := tt.processor.Process(uploadedFile, true)
 			if tt.expectedProcessError && err != nil {
@@ -115,7 +115,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				s.Failf("Cannot process file", "%v", err)
 				return
 			}
-	
+
 			select {
 			case <-time.After(3 * time.Second):
 				// We timed out!
@@ -127,34 +127,34 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				// Job done! We are good!
 			}
 			for _, format := range tt.processor.Options().Formats() {
-				fileDiskPath := job.File.DiskPath()+":"+format.Name()
+				fileDiskPath := job.File.DiskPath() + "-" + format.Name()
 				content, err := ioutil.ReadFile(fileDiskPath)
 				if err != nil {
 					s.Failf("Cannot open processed file", "%s: %v", fileDiskPath, err)
 					return
 				}
-	
-				defer func(){
+
+				defer func() {
 					// Cleanup
 					if err = os.Remove(fileDiskPath); err != nil {
 						// Not a problem!
 					}
 				}()
-		
-				expectedFileDiskPath := tt.expectedFile+":"+format.Name()
+
+				expectedFileDiskPath := tt.expectedFile + "-" + format.Name()
 				if *update {
 					if err = ioutil.WriteFile(filepath.Join(testDataFolder, expectedFileDiskPath), content, 0644); err != nil {
 						s.Failf("Cannot update golden file", "%s: %v", expectedFileDiskPath, err)
 						continue
 					}
 				}
-		
+
 				expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, expectedFileDiskPath))
 				if err != nil {
 					s.Failf("Cannot open output golden file", "%s: %v", expectedFileDiskPath, err)
 					continue
 				}
-		
+
 				// Check if file content valid
 				s.Equalf(expectedContent, content, "Uploaded content invalid")
 			}

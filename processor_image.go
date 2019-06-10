@@ -3,12 +3,12 @@ package upload
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"image"
 	"image/color"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"log"
 	"os"
 
 	"github.com/disintegration/imaging"
@@ -44,9 +44,9 @@ var (
 
 // Job represents current image file being processed
 type Job struct {
-	File	Uploaded
-	Config	*image.Config
-	Done 	chan struct{}
+	File   Uploaded
+	Config *image.Config
+	Done   chan struct{}
 }
 
 type assetBoxer interface {
@@ -75,7 +75,7 @@ func AssetBox(assetBox assetBoxer) {
 }
 
 // ImageProcessor implements the processor interface
-type ImageProcessor struct{
+type ImageProcessor struct {
 	options *OptionsImage
 }
 
@@ -119,11 +119,11 @@ func (p *ImageProcessor) Process(file Uploaded, validate bool) (*Job, error) {
 	}
 
 	job := &Job{
-		File:	file,
-		Config:	&config,
-		Done: 	make(chan struct{}),
+		File:   file,
+		Config: &config,
+		Done:   make(chan struct{}),
 	}
-	
+
 	go p.process(job)
 
 	return job, nil
@@ -179,10 +179,10 @@ func (p *ImageProcessor) process(job *Job) {
 			// Open a new image to use as backdrop layer
 			var back image.Image
 			if core.Env == core.EnvironmentDEV {
-				back, err = imaging.Open(_diskPathBackdrop + ":" + format.name)
+				back, err = imaging.Open(_diskPathBackdrop + "-" + format.name)
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(_diskPathBackdrop + ":" + format.name)
+				staticAsset, err = _assetBox.Open(_diskPathBackdrop + "-" + format.name)
 				if err != nil {
 					// if err, fall back to a blue background backdrop
 					back = imaging.New(format.width, format.height, color.NRGBA{0, 29, 56, 0})
@@ -212,10 +212,10 @@ func (p *ImageProcessor) process(job *Job) {
 		if _diskPathWatermark != "" && format.watermark != nil {
 			var watermark image.Image
 			if core.Env == core.EnvironmentDEV {
-				watermark, err = imaging.Open(_diskPathWatermark + ":" + format.name)
+				watermark, err = imaging.Open(_diskPathWatermark + "-" + format.name)
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(_diskPathWatermark + ":" + format.name)
+				staticAsset, err = _assetBox.Open(_diskPathWatermark + "-" + format.name)
 				if err != nil {
 					log.Printf("Watermark not found: %v", err)
 					continue
@@ -272,7 +272,7 @@ func (p *ImageProcessor) process(job *Job) {
 			continue
 		}
 
-		outputFile, err := os.Create(imgDiskPath + ":" + format.name)
+		outputFile, err := os.Create(imgDiskPath + "-" + format.name)
 		if err != nil {
 			log.Printf("Image get format error: %v", err)
 			continue

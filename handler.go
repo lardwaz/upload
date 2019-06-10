@@ -19,7 +19,7 @@ func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var suffix string
 	for _, format := range s.opts.Formats() {
-		formatSuffix := ":" + format.name
+		formatSuffix := "-" + format.name
 		if strings.HasSuffix(p, formatSuffix) {
 			suffix = formatSuffix
 		}
