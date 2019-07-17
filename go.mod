@@ -1,4 +1,4 @@
-module go.lsl.digital/gocipe/upload
+module go.lsl.digital/lardwaz/upload
 
 require (
 	github.com/disintegration/imaging v1.5.0

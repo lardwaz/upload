@@ -1,7 +1,7 @@
 package upload
 
 import (
-	"go.lsl.digital/gocipe/upload/core"
+	"go.lsl.digital/lardwaz/upload/core"
 	"github.com/h2non/filetype/types"
 )
 

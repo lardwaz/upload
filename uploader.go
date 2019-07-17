@@ -1,4 +1,4 @@
-package upload // import "go.lsl.digital/gocipe/upload"
+package upload // import "go.lsl.digital/lardwaz/upload"
 
 // Uploader represents a file uploader (SMI)
 type Uploader interface {

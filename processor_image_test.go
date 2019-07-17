@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	"go.lsl.digital/gocipe/upload"
-	"go.lsl.digital/gocipe/upload/core"
+	"go.lsl.digital/lardwaz/upload"
+	"go.lsl.digital/lardwaz/upload/core"
 )
 
 type mockAssetBoxer struct{}
