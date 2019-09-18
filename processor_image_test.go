@@ -29,7 +29,7 @@ type imageProcessTest struct {
 	inputFile            string
 	expectedFile         string
 	expectedProcessError bool
-	processor            *upload.ImageProcessor
+	processor            upload.ImageProcessor
 }
 
 type ProcessorTestSuite struct {
@@ -49,35 +49,35 @@ func (s *ProcessorTestSuite) SetupSuite() {
 	s.imageProcessTests = []imageProcessTest{
 		{"Normal No Format", false, "normal.jpg", "noformat_normal_out.jpg", false, upload.NewImageProcessor()},
 		{"Normal No Format PNG", false, "normal.png", "noformat_normal_out.png", false, upload.NewImageProcessor()},
-		{"Normal Format", false, "normal.jpg", "format_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("thumb", 200, 200, false))},
-		{"Normal Format Negative Width & Height", false, "normal.jpg", "format_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("neg", -1, -1, false))},
-		{"PROD Normal Format", true, "normal.jpg", "format_prod_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("thumb", 200, 200, false))},
-		{"Normal Format PNG", false, "normal.png", "format_normal_out.png", false, upload.NewImageProcessor(upload.Formats("thumb", 200, 200, false))},
-		{"PROD Normal Format PNG", true, "normal.png", "format_prod_normal_out.png", false, upload.NewImageProcessor(upload.Formats("thumb", 200, 200, false))},
-		{"Normal Height Zero", false, "normal.jpg", "aspect_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("hzero", 200, 0, false))},
-		{"Normal Width Zero", false, "normal.jpg", "aspect_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("wzero", 0, 200, false))},
-		{"Normal Upscale", false, "normal.jpg", "upscale_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("upscale", 500, 500, false))},
+		{"Normal Format", false, "normal.jpg", "format_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("thumb"), upload.FormatWidth(200), upload.FormatHeight(200)))},
+		{"Normal Format Negative Width & Height", false, "normal.jpg", "format_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("neg"), upload.FormatWidth(-1), upload.FormatHeight(-1)))},
+		{"PROD Normal Format", true, "normal.jpg", "format_prod_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("thumb"), upload.FormatWidth(200), upload.FormatHeight(200)))},
+		{"Normal Format PNG", false, "normal.png", "format_normal_out.png", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("thumb"), upload.FormatWidth(200), upload.FormatHeight(200)))},
+		{"PROD Normal Format PNG", true, "normal.png", "format_prod_normal_out.png", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("thumb"), upload.FormatWidth(200), upload.FormatHeight(200)))},
+		{"Normal Height Zero", false, "normal.jpg", "aspect_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("hzero"), upload.FormatWidth(200)))},
+		{"Normal Width Zero", false, "normal.jpg", "aspect_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("wzero"), upload.FormatHeight(200)))},
+		{"Normal Upscale", false, "normal.jpg", "upscale_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("upscale"), upload.FormatWidth(500), upload.FormatHeight(500)))},
 		{"Small Width", false, "normal.jpg", "min_normal_out.jpg", true, upload.NewImageProcessor(upload.MinWidth(500))},
 		{"Small Height", false, "normal.jpg", "min_normal_out.jpg", true, upload.NewImageProcessor(upload.MinHeight(500))},
 		{"Invalid File Type", false, "damaged.jpg", "invalid_normal_out.jpg", true, upload.NewImageProcessor()},
 		{"Invalid Image Type", false, "normal.gif", "invalid_normal_out.gif", true, upload.NewImageProcessor()},
-		{"Watermark Top Left", false, "normal.jpg", "watermarked_tl_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Left), upload.WatermarkVertical(upload.Top)))},
-		{"Watermark Top Center", false, "normal.jpg", "watermarked_tc_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Top)))},
-		{"Watermark Top Right", false, "normal.jpg", "watermarked_tr_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Right), upload.WatermarkVertical(upload.Top)))},
-		{"Watermark Bottom Left", false, "normal.jpg", "watermarked_bl_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Left), upload.WatermarkVertical(upload.Bottom)))},
-		{"Watermark Bottom Center", false, "normal.jpg", "watermarked_bc_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Bottom)))},
-		{"Watermark Bottom Right", false, "normal.jpg", "watermarked_br_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Right), upload.WatermarkVertical(upload.Bottom)))},
-		{"Watermark Center Left", false, "normal.jpg", "watermarked_cl_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Left), upload.WatermarkVertical(upload.Center)))},
-		{"Watermark Center Center", false, "normal.jpg", "watermarked_cc_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Center)))},
-		{"Watermark Center Right", false, "normal.jpg", "watermarked_cr_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(upload.Right), upload.WatermarkVertical(upload.Center)))},
-		{"Watermark Bad Pos", false, "normal.jpg", "watermarked_bad_prod_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(10), upload.WatermarkVertical(10)))},
-		{"PROD Watermark Bad Pos", true, "normal.jpg", "watermarked_bad_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("water", 400, 400, false, upload.WatermarkHorizontal(10), upload.WatermarkVertical(10)))},
-		{"Watermark Bad Pos", false, "normal.jpg", "watermarked_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("damaged", 400, 400, false, upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Center)))},
-		{"Backdrop Landscape", false, "normal.jpg", "backdropped_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("back", 200, 200, true))},
-		{"PROD Backdrop Landscape", true, "normal.jpg", "backdropped_prod_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats("back", 200, 200, true))},
-		{"Backdrop Portrait", false, "portrait.jpg", "backdropped_portrait_out.jpg", false, upload.NewImageProcessor(upload.Formats("back", 200, 200, true))},
-		{"PROD Backdrop Portrait", true, "portrait.jpg", "backdropped_prod_portrait_out.jpg", false, upload.NewImageProcessor(upload.Formats("back", 200, 200, true))},
-		{"Backdrop Damaged", false, "portrait.jpg", "backdropped_portrait_out.jpg", false, upload.NewImageProcessor(upload.Formats("damaged", 200, 200, true))},
+		{"Watermark Top Left", false, "normal.jpg", "watermarked_tl_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Left), upload.WatermarkVertical(upload.Top))))},
+		{"Watermark Top Center", false, "normal.jpg", "watermarked_tc_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Top))))},
+		{"Watermark Top Right", false, "normal.jpg", "watermarked_tr_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Right), upload.WatermarkVertical(upload.Top))))},
+		{"Watermark Bottom Left", false, "normal.jpg", "watermarked_bl_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Left), upload.WatermarkVertical(upload.Bottom))))},
+		{"Watermark Bottom Center", false, "normal.jpg", "watermarked_bc_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Bottom))))},
+		{"Watermark Bottom Right", false, "normal.jpg", "watermarked_br_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Right), upload.WatermarkVertical(upload.Bottom))))},
+		{"Watermark Center Left", false, "normal.jpg", "watermarked_cl_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Left), upload.WatermarkVertical(upload.Center))))},
+		{"Watermark Center Center", false, "normal.jpg", "watermarked_cc_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Center))))},
+		{"Watermark Center Right", false, "normal.jpg", "watermarked_cr_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Right), upload.WatermarkVertical(upload.Center))))},
+		{"Watermark Bad Pos", false, "normal.jpg", "watermarked_bad_prod_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(10), upload.WatermarkVertical(10))))},
+		{"PROD Watermark Bad Pos", true, "normal.jpg", "watermarked_bad_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("water"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(10), upload.WatermarkVertical(10))))},
+		{"Watermark Bad Pos", false, "normal.jpg", "watermarked_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("damaged"), upload.FormatWidth(400), upload.FormatHeight(400), upload.FormatWatermark(upload.WatermarkHorizontal(upload.Center), upload.WatermarkVertical(upload.Center))))},
+		{"Backdrop Landscape", false, "normal.jpg", "backdropped_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("back"), upload.FormatWidth(200), upload.FormatHeight(200), upload.FormatBackdrop(true)))},
+		{"PROD Backdrop Landscape", true, "normal.jpg", "backdropped_prod_normal_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("back"), upload.FormatWidth(200), upload.FormatHeight(200), upload.FormatBackdrop(true)))},
+		{"Backdrop Portrait", false, "portrait.jpg", "backdropped_portrait_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("back"), upload.FormatWidth(200), upload.FormatHeight(200), upload.FormatBackdrop(true)))},
+		{"PROD Backdrop Portrait", true, "portrait.jpg", "backdropped_prod_portrait_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("back"), upload.FormatWidth(200), upload.FormatHeight(200), upload.FormatBackdrop(true)))},
+		{"Backdrop Damaged", false, "portrait.jpg", "backdropped_portrait_out.jpg", false, upload.NewImageProcessor(upload.Formats(upload.FormatName("damaged"), upload.FormatWidth(200), upload.FormatHeight(200), upload.FormatBackdrop(true)))},
 	}
 }
 
@@ -124,7 +124,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 					return
 				}
 			case <-job.Done():
-				// Job done! We are good!
+			// Job done! We are good!
 
 			case err = <-job.Failed():
 				// Job failed! Did we expect?
@@ -134,7 +134,9 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				}
 			}
 
-			for _, format := range tt.processor.Options().Formats() {
+			formats := tt.processor.Options().Formats()
+
+			formats.Each(func(name string, format upload.OptionsFormat) {
 				fileDiskPath := job.File().DiskPath() + "-" + format.Name()
 				content, err := ioutil.ReadFile(fileDiskPath)
 				if err != nil {
@@ -153,19 +155,19 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				if *update {
 					if err = ioutil.WriteFile(filepath.Join(testDataFolder, expectedFileDiskPath), content, 0644); err != nil {
 						s.Failf("Cannot update golden file", "%s: %v", expectedFileDiskPath, err)
-						continue
+						return
 					}
 				}
 
 				expectedContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, expectedFileDiskPath))
 				if err != nil {
 					s.Failf("Cannot open output golden file", "%s: %v", expectedFileDiskPath, err)
-					continue
+					return
 				}
 
 				// Check if file content valid
 				s.Equalf(expectedContent, content, "Uploaded content invalid")
-			}
+			})
 		})
 	}
 }

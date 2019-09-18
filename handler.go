@@ -11,19 +11,22 @@ import (
 type httpImageDirHandler struct {
 	root   http.FileSystem
 	prefix string
-	opts   *OptionsImage
+	opts   OptionsImage
 }
 
 func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := r.URL.Path
 
 	var suffix string
-	for _, format := range s.opts.Formats() {
-		formatSuffix := "-" + format.name
+
+	formats := s.opts.Formats()
+
+	formats.Each(func(name string, format OptionsFormat) {
+		formatSuffix := "-" + format.Name()
 		if strings.HasSuffix(p, formatSuffix) {
 			suffix = formatSuffix
 		}
-	}
+	})
 
 	if suffix == "" {
 		//a previous attempt to lookup the file resulted into a call to this function

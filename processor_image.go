@@ -69,13 +69,13 @@ func AssetBox(assetBox assetBoxer) {
 
 // ImageProcessor implements the processor interface
 type ImageProcessor struct {
-	options *OptionsImage
+	options OptionsImage
 }
 
 // NewImageProcessor returns a new ImageProcessor
-func NewImageProcessor(opts ...OptionImage) *ImageProcessor {
+func NewImageProcessor(opts ...func(OptionsImage)) ImageProcessor {
 	options := evaluateImageOptions(opts...)
-	processor := &ImageProcessor{
+	processor := ImageProcessor{
 		options: options,
 	}
 
@@ -84,7 +84,7 @@ func NewImageProcessor(opts ...OptionImage) *ImageProcessor {
 
 // Options returns OptionsImage
 func (p ImageProcessor) Options() OptionsImage {
-	return *p.options
+	return p.options
 }
 
 // Process adds a job to process an image based on specific options
@@ -101,14 +101,14 @@ func (p *ImageProcessor) Process(file Uploaded, validate bool) (Job, error) {
 	}
 
 	// Check min width and height
-	if validate && p.options.minWidth != core.NoLimit && config.Width < p.options.minWidth {
-		log.Printf("image %v lower than min width: %v\n", file.DiskPath(), p.options.minWidth)
-		return nil, fmt.Errorf("image width less than %dpx", p.options.minWidth)
+	if validate && p.options.MinWidth() != core.NoLimit && config.Width < p.options.MinWidth() {
+		log.Printf("image %v lower than min width: %v\n", file.DiskPath(), p.options.MinWidth())
+		return nil, fmt.Errorf("image width less than %dpx", p.options.MinWidth())
 	}
 
-	if validate && p.options.minHeight != core.NoLimit && config.Height < p.options.minHeight {
-		log.Printf("image %v lower than min height: %v\n", file.DiskPath(), p.options.minHeight)
-		return nil, fmt.Errorf("image height less than %dpx", p.options.minHeight)
+	if validate && p.options.MinHeight() != core.NoLimit && config.Height < p.options.MinHeight() {
+		log.Printf("image %v lower than min height: %v\n", file.DiskPath(), p.options.MinHeight())
+		return nil, fmt.Errorf("image height less than %dpx", p.options.MinHeight())
 	}
 
 	job := NewGenericJob(file)
@@ -124,9 +124,11 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 		err error
 	)
 
-	for _, format := range p.options.formats {
-		if format.name == "" {
-			continue
+	formats := p.options.Formats()
+
+	formats.Each(func(name string, format OptionsFormat) {
+		if format.Name() == "" {
+			return
 		}
 
 		imgDiskPath := job.File().DiskPath()
@@ -134,26 +136,26 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 		img, err = imaging.Open(imgDiskPath)
 		if err != nil {
 			log.Printf("Image error: %v\n", err)
-			continue
+			return
 		}
 
 		// Prepare metra for processing
-		newWidth := format.width
-		newHeight := format.height
+		newWidth := format.Width()
+		newHeight := format.Height()
 
 		// Do not upscale
-		if format.width > config.Width {
+		if format.Width() > config.Width {
 			newWidth = config.Width
 		}
-		if format.height > config.Height {
+		if format.Height() > config.Height {
 			newHeight = config.Height
 		}
 
 		// -1 pixel size does not exist
-		if format.width < 0 {
+		if format.Width() < 0 {
 			newWidth = 0
 		}
-		if format.height < 0 {
+		if format.Height() < 0 {
 			newHeight = 0
 		}
 
@@ -161,20 +163,20 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 		preserveAspect := newWidth <= 0 || newHeight <= 0
 
 		// Do not crop and resize when using backdrop but downscale
-		if _diskPathBackdrop != "" && format.backdrop && !landscape {
+		if _diskPathBackdrop != "" && format.Backdrop() && !landscape {
 			// Scale down srcImage to fit the bounding box
 			img = imaging.Fit(img, newWidth, newHeight, imaging.Lanczos)
 
 			// Open a new image to use as backdrop layer
 			var back image.Image
 			if core.Env == core.EnvironmentDEV {
-				back, err = imaging.Open(_diskPathBackdrop + "-" + format.name)
+				back, err = imaging.Open(_diskPathBackdrop + "-" + format.Name())
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(_diskPathBackdrop + "-" + format.name)
+				staticAsset, err = _assetBox.Open(_diskPathBackdrop + "-" + format.Name())
 				if err != nil {
 					// if err, fall back to a blue background backdrop
-					back = imaging.New(format.width, format.height, color.NRGBA{0, 29, 56, 0})
+					back = imaging.New(format.Width(), format.Height(), color.NRGBA{0, 29, 56, 0})
 				}
 				defer staticAsset.Close()
 				back, _, err = image.Decode(staticAsset)
@@ -182,10 +184,10 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 
 			if err != nil {
 				// if err, fall back to a blue background backdrop
-				back = imaging.New(format.width, format.height, color.NRGBA{0, 29, 56, 0})
+				back = imaging.New(format.Width(), format.Height(), color.NRGBA{0, 29, 56, 0})
 			} else {
 				// Resize and crop backdrop accordingly
-				back = imaging.Fill(back, format.width, format.height, imaging.Center, imaging.Lanczos)
+				back = imaging.Fill(back, format.Width(), format.Height(), imaging.Center, imaging.Lanczos)
 			}
 
 			// Overlay image in center on backdrop layer
@@ -198,16 +200,16 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 			img = imaging.Fill(img, newWidth, newHeight, imaging.Center, imaging.Lanczos)
 		}
 
-		if _diskPathWatermark != "" && format.watermark != nil {
+		if _diskPathWatermark != "" && format.Watermark() != nil {
 			var watermark image.Image
 			if core.Env == core.EnvironmentDEV {
-				watermark, err = imaging.Open(_diskPathWatermark + "-" + format.name)
+				watermark, err = imaging.Open(_diskPathWatermark + "-" + format.Name())
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(_diskPathWatermark + "-" + format.name)
+				staticAsset, err = _assetBox.Open(_diskPathWatermark + "-" + format.Name())
 				if err != nil {
 					log.Printf("Watermark not found: %v", err)
-					continue
+					return
 				}
 				defer staticAsset.Close()
 				watermark, _, err = image.Decode(staticAsset)
@@ -223,32 +225,32 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 
 				var watermarkPos image.Point
 
-				switch format.watermark.horizontal {
+				switch format.Watermark().Horizontal() {
 				default:
-					format.watermark.horizontal = Left
+					format.Watermark().SetHorizontal(Left)
 					fallthrough
 				case Left:
-					watermarkPos.X += format.watermark.offsetX
+					watermarkPos.X += format.Watermark().OffsetX()
 				case Right:
 					RightX := bgBounds.Min.X + bgW - watermarkW
-					watermarkPos.X = RightX - format.watermark.offsetX
+					watermarkPos.X = RightX - format.Watermark().OffsetX()
 				case Center:
 					CenterX := bgBounds.Min.X + bgW/2
-					watermarkPos.X = CenterX - watermarkW/2 + format.watermark.offsetX
+					watermarkPos.X = CenterX - watermarkW/2 + format.Watermark().OffsetX()
 				}
 
-				switch format.watermark.vertical {
+				switch format.Watermark().Vertical() {
 				default:
-					format.watermark.vertical = Top
+					format.Watermark().SetVertical(Top)
 					fallthrough
 				case Top:
-					watermarkPos.Y += format.watermark.offsetY
+					watermarkPos.Y += format.Watermark().OffsetY()
 				case Bottom:
 					BottomY := bgBounds.Min.Y + bgH - watermarkH
-					watermarkPos.Y = BottomY - format.watermark.offsetY
+					watermarkPos.Y = BottomY - format.Watermark().OffsetY()
 				case Center:
 					CenterY := bgBounds.Min.Y + bgH/2
-					watermarkPos.Y = CenterY - watermarkH/2 + format.watermark.offsetY
+					watermarkPos.Y = CenterY - watermarkH/2 + format.Watermark().OffsetY()
 				}
 
 				img = imaging.Overlay(img, watermark, watermarkPos, 1.0)
@@ -258,20 +260,20 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 		imagingFormat, err := imaging.FormatFromFilename(imgDiskPath)
 		if err != nil {
 			log.Printf("Image get format error: %v", err)
-			continue
+			return
 		}
 
-		outputFile, err := os.Create(imgDiskPath + "-" + format.name)
+		outputFile, err := os.Create(imgDiskPath + "-" + format.Name())
 		if err != nil {
 			log.Printf("Image get format error: %v", err)
-			continue
+			return
 		}
 		defer outputFile.Close()
 
 		if err := imaging.Encode(outputFile, img, imagingFormat); err != nil {
 			log.Printf("Image encode format error: %v", err)
 		}
-	}
+	})
 
 	job.SetDone()
 }

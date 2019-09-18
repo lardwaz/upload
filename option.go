@@ -14,7 +14,7 @@ var (
 	}
 )
 
-// Options represents sets of upload options
+// Options represents a set of upload options
 type Options interface {
 	Dir() string
 	SetDir(string)
@@ -25,7 +25,7 @@ type Options interface {
 	FileType() []types.Type
 	AddFileType(types.Type)
 	MaxSize() int
-	SetMaxSize(int)
+	SetMaxSize(sz int)
 	ConvertTo(t types.Type) types.Type
 	SetConvertTo(old types.Type, new types.Type)
 	FileTypeExist(t types.Type) bool

@@ -1,115 +1,101 @@
 package upload
 
 import (
+	"log"
+
 	"go.lsl.digital/lardwaz/upload/core"
 )
 
 var (
-	defaultImageOptions = &OptionsImage{
+	defaultImageOptions = &OptsImage{
 		minWidth:  core.NoLimit,
 		minHeight: core.NoLimit,
 	}
 )
 
-// Format holds dimensions options for Format
-type Format struct {
-	name      string
-	width     int
-	height    int
-	backdrop  bool              // (default: false) If true, will add a backdrop
-	watermark *OptionsWatermark // (default: nil) If not nil, will overlay an image as watermark at X,Y pos +-OffsetX,OffsetY
+// OptionsImage represents a set of image processing options
+type OptionsImage interface {
+	MinWidth() int
+	SetMinWidth(w int)
+	MinHeight() int
+	SetMinHeight(h int)
+	Formats() OptionsFormats
+	SetFormats(opts OptionsFormats)
 }
 
-// Name returns Name option format
-func (o Format) Name() string {
-	return o.name
-}
-
-// Width returns Width option format
-func (o Format) Width() int {
-	return o.width
-}
-
-// Height returns Height option format
-func (o Format) Height() int {
-	return o.height
-}
-
-// Backdrop returns Backdrop option format
-func (o Format) Backdrop() bool {
-	return o.backdrop
-}
-
-// Watermark returns Watermark option format
-func (o Format) Watermark() OptionsWatermark {
-	return *o.watermark
-}
-
-type OptionsImage struct {
+// OptsImage is an implementation of OptionsImage
+type OptsImage struct {
 	minWidth  int
 	minHeight int
-	formats   []Format
+	formats   OptionsFormats
+}
+
+// MinWidth returns MinWidth
+func (o OptsImage) MinWidth() int {
+	return o.minWidth
+}
+
+// SetMinWidth sets MinWidth
+func (o *OptsImage) SetMinWidth(w int) {
+	o.minWidth = w
+}
+
+// MinHeight returns MinHeight
+func (o OptsImage) MinHeight() int {
+	return o.minHeight
+}
+
+// SetMinHeight sets MinHeight
+func (o *OptsImage) SetMinHeight(h int) {
+	o.minHeight = h
+}
+
+// Formats returns Formats
+func (o OptsImage) Formats() OptionsFormats {
+	return o.formats
+}
+
+// SetFormats set Formats
+func (o *OptsImage) SetFormats(opts OptionsFormats) {
+	o.formats = opts
 }
 
 // evaluateImageOptions returns optionsImage
-func evaluateImageOptions(opts ...OptionImage) *OptionsImage {
-	optCopy := &OptionsImage{}
+func evaluateImageOptions(opts ...func(OptionsImage)) OptionsImage {
+	optCopy := &OptsImage{}
 	*optCopy = *defaultImageOptions
+	optCopy.formats = NewOptionsFormats()
 	for _, o := range opts {
 		o(optCopy)
 	}
 	return optCopy
 }
 
-// MinWidth returns MinWidth option image
-func (o OptionsImage) MinWidth() int {
-	return o.minWidth
-}
-
-// MinHeight returns MinHeight option image
-func (o OptionsImage) MinHeight() int {
-	return o.minHeight
-}
-
-// Formats returns Formats option image
-func (o OptionsImage) Formats() []Format {
-	return o.formats
-}
-
-// OptionImage is a function to modify options image
-type OptionImage func(*OptionsImage)
-
 // MinWidth returns a function to modify MinWidth option image
-func MinWidth(d int) OptionImage {
-	return func(o *OptionsImage) {
-		o.minWidth = d
+func MinWidth(w int) func(OptionsImage) {
+	return func(o OptionsImage) {
+		o.SetMinWidth(w)
 	}
 }
 
 // MinHeight returns a function to modify MinHeight option image
-func MinHeight(d int) OptionImage {
-	return func(o *OptionsImage) {
-		o.minHeight = d
+func MinHeight(h int) func(OptionsImage) {
+	return func(o OptionsImage) {
+		o.SetMinHeight(h)
 	}
 }
 
 // Formats returns a function to add Format option image
-func Formats(name string, width int, height int, backdrop bool, opts ...OptionWatermark) OptionImage {
-	return func(o *OptionsImage) {
-		var watermarkOpts *OptionsWatermark
-		if len(opts) == 0 {
-			watermarkOpts = nil
-		} else {
-			watermarkOpts = EvaluateWatermarkOptions(opts...)
-		}
+func Formats(opts ...func(OptionsFormat)) func(OptionsImage) {
+	return func(o OptionsImage) {
+		format := evaluateFormatOptions(opts...)
 
-		imageFormat := Format{
-			name:      name,
-			width:     width,
-			height:    height,
-			backdrop:  backdrop,
-			watermark: watermarkOpts,
-		}
-		o.formats = append(o.formats, imageFormat)
+		formats := o.Formats()
+
+		log.Println("Formats", formats)
+
+		formats.Set(format)
+
+		o.SetFormats(formats)
 	}
 }
