@@ -13,7 +13,7 @@ type GenericUploader struct {
 
 // NewGenericUploader returns GenericUploader
 func NewGenericUploader(opts ...Option) *GenericUploader {
-	options := EvaluateOptions(opts...)
+	options := evaluateOptions(opts...)
 	return &GenericUploader{Options: options}
 }
 

@@ -74,7 +74,7 @@ type ImageProcessor struct {
 
 // NewImageProcessor returns a new ImageProcessor
 func NewImageProcessor(opts ...OptionImage) *ImageProcessor {
-	options := EvaluateImageOptions(opts...)
+	options := evaluateImageOptions(opts...)
 	processor := &ImageProcessor{
 		options: options,
 	}

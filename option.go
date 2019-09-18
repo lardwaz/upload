@@ -65,8 +65,8 @@ func (o Options) FileTypeExist(t types.Type) bool {
 	return false
 }
 
-// EvaluateOptions returns list of options
-func EvaluateOptions(opts ...Option) *Options {
+// evaluateOptions returns list of options
+func evaluateOptions(opts ...Option) *Options {
 	optCopy := &Options{}
 	*optCopy = *defaultOptions
 	for _, o := range opts {

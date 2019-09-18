@@ -13,7 +13,7 @@ type ImageUploader struct {
 
 // NewImageUploader returns ImageUploader
 func NewImageUploader(opts ...Option) *ImageUploader {
-	options := EvaluateOptions(opts...)
+	options := evaluateOptions(opts...)
 	return &ImageUploader{Options: options}
 }
 

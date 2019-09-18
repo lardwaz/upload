@@ -51,8 +51,8 @@ type OptionsImage struct {
 	formats   []Format
 }
 
-// EvaluateImageOptions returns optionsImage
-func EvaluateImageOptions(opts ...OptionImage) *OptionsImage {
+// evaluateImageOptions returns optionsImage
+func evaluateImageOptions(opts ...OptionImage) *OptionsImage {
 	optCopy := &OptionsImage{}
 	*optCopy = *defaultImageOptions
 	for _, o := range opts {
