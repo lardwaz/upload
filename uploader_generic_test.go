@@ -8,7 +8,6 @@ import (
 
 	"github.com/stretchr/testify/suite"
 	"go.lsl.digital/lardwaz/upload"
-
 )
 
 type genericUploadTest struct {
@@ -30,7 +29,7 @@ func (s *GenericUploaderTestSuite) SetupSuite() {
 	common := []upload.Option{
 		upload.Dir(testDataFolder),
 		upload.Destination("tmp"),
-		upload.MediaPrefixURL("/"+testDataFolder+"/"),
+		upload.MediaPrefixURL("/" + testDataFolder + "/"),
 		upload.FileType(upload.TypePDF),
 		upload.FileType(upload.TypeMP3),
 		upload.FileType(upload.TypeMP4),
@@ -59,7 +58,7 @@ func (s *GenericUploaderTestSuite) SetupSuite() {
 
 func (s *GenericUploaderTestSuite) TestGenericUpload() {
 	for _, tt := range s.genericUploadTests {
-		s.Run(tt.name, func(){
+		s.Run(tt.name, func() {
 			inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
 			if err != nil {
 				s.Failf("Cannot open input golden file", "%s: %v", tt.inputFile, err)

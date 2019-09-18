@@ -7,7 +7,7 @@ import (
 
 // ImageUploader is an image uploader
 type ImageUploader struct {
-	Options  *Options
+	Options   *Options
 	Processor *ImageProcessor
 }
 

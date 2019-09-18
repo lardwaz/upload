@@ -1,8 +1,8 @@
 package upload
 
 import (
-	"go.lsl.digital/lardwaz/upload/core"
 	"github.com/h2non/filetype/types"
+	"go.lsl.digital/lardwaz/upload/core"
 )
 
 var (
@@ -10,7 +10,7 @@ var (
 		dir:            "media",
 		mediaPrefixURL: "/media/",
 		maxSize:        core.NoLimit,
-		convertTo: 		make(map[types.Type]types.Type),
+		convertTo:      make(map[types.Type]types.Type),
 	}
 )
 
@@ -25,37 +25,37 @@ type Options struct {
 }
 
 // Dir returns Dir
-func(o Options) Dir() string {
+func (o Options) Dir() string {
 	return o.dir
 }
 
 // Destination returns Destination
-func(o Options) Destination() string {
+func (o Options) Destination() string {
 	return o.destination
 }
 
 // MediaPrefixURL returns MediaPrefixURL
-func(o Options) MediaPrefixURL() string {
+func (o Options) MediaPrefixURL() string {
 	return o.mediaPrefixURL
 }
 
 // FileType returns FileType
-func(o Options) FileType() []types.Type {
+func (o Options) FileType() []types.Type {
 	return o.fileType
 }
 
 // MaxSize returns MaxSize
-func(o Options) MaxSize() int {
+func (o Options) MaxSize() int {
 	return o.maxSize
 }
 
 // ConvertTo returns ConvertTo
-func(o Options) ConvertTo(t types.Type) types.Type {
+func (o Options) ConvertTo(t types.Type) types.Type {
 	return o.convertTo[t]
 }
 
 // FileTypeExist checks if filetype exists
-func(o Options) FileTypeExist(t types.Type) bool {
+func (o Options) FileTypeExist(t types.Type) bool {
 	for _, fileType := range o.fileType {
 		if fileType == t {
 			return true

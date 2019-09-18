@@ -8,7 +8,7 @@ import (
 // GenericUploader is a generic uploader
 // Does not have a processor
 type GenericUploader struct {
-	Options  *Options
+	Options *Options
 }
 
 // NewGenericUploader returns GenericUploader

@@ -37,7 +37,7 @@ func NewUploadedFile(name string, opts Options) *UploadedFile {
 	dirPath := path.Join(opts.Dir(), opts.Destination())
 	name = AddTimestamp(name)
 	urlPath := path.Join(opts.MediaPrefixURL(), opts.Destination(), name)
-	currentTime := time.Now() 
+	currentTime := time.Now()
 	diskPath := filepath.Join(dirPath, fmt.Sprintf("%d", currentTime.Year()), fmt.Sprintf("%v", currentTime.Month()), name)
 
 	return &UploadedFile{

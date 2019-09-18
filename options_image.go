@@ -21,27 +21,27 @@ type Format struct {
 }
 
 // Name returns Name option format
-func(o Format) Name() string {
+func (o Format) Name() string {
 	return o.name
 }
 
 // Width returns Width option format
-func(o Format) Width() int {
+func (o Format) Width() int {
 	return o.width
 }
 
 // Height returns Height option format
-func(o Format) Height() int {
+func (o Format) Height() int {
 	return o.height
 }
 
 // Backdrop returns Backdrop option format
-func(o Format) Backdrop() bool {
+func (o Format) Backdrop() bool {
 	return o.backdrop
 }
 
 // Watermark returns Watermark option format
-func(o Format) Watermark() OptionsWatermark {
+func (o Format) Watermark() OptionsWatermark {
 	return *o.watermark
 }
 
@@ -62,17 +62,17 @@ func EvaluateImageOptions(opts ...OptionImage) *OptionsImage {
 }
 
 // MinWidth returns MinWidth option image
-func(o OptionsImage) MinWidth() int {
+func (o OptionsImage) MinWidth() int {
 	return o.minWidth
 }
 
 // MinHeight returns MinHeight option image
-func(o OptionsImage) MinHeight() int {
+func (o OptionsImage) MinHeight() int {
 	return o.minHeight
 }
 
 // Formats returns Formats option image
-func(o OptionsImage) Formats() []Format {
+func (o OptionsImage) Formats() []Format {
 	return o.formats
 }
 

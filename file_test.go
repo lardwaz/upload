@@ -31,29 +31,29 @@ func NewMockUploadedFile(name string, opts Options) *mockUploadedFile {
 	}
 }
 
-func(m *mockUploadedFile) URLPath() string {
+func (m *mockUploadedFile) URLPath() string {
 	return m.url
 }
 
-func(m *mockUploadedFile) DiskPath() string {
+func (m *mockUploadedFile) DiskPath() string {
 	return m.diskPath
 }
 
-func(m *mockUploadedFile) Content() []byte {
+func (m *mockUploadedFile) Content() []byte {
 	return m.content
 }
 
-func(m *mockUploadedFile) Save(content []byte, overwrite bool) error {
+func (m *mockUploadedFile) Save(content []byte, overwrite bool) error {
 	// Don't need an actual implementation
 	return nil
 }
 
-func(m *mockUploadedFile) Delete() error {
+func (m *mockUploadedFile) Delete() error {
 	// Don't need an actual implementation
 	return nil
 }
 
-func(m *mockUploadedFile) ChangeExt(string) error {
+func (m *mockUploadedFile) ChangeExt(string) error {
 	// Don't need an actual implementation
 	return nil
 }

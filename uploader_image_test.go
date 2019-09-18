@@ -9,7 +9,6 @@ import (
 
 	"github.com/stretchr/testify/suite"
 	"go.lsl.digital/lardwaz/upload"
-
 )
 
 const (
@@ -37,7 +36,7 @@ func (s *ImageUploaderTestSuite) SetupSuite() {
 	common := []upload.Option{
 		upload.Dir(testDataFolder),
 		upload.Destination("tmp"),
-		upload.MediaPrefixURL("/"+testDataFolder+"/"),
+		upload.MediaPrefixURL("/" + testDataFolder + "/"),
 		upload.FileType(upload.TypeJPEG),
 		upload.FileType(upload.TypeJPEG2),
 		upload.FileType(upload.TypePNG),
@@ -63,7 +62,7 @@ func (s *ImageUploaderTestSuite) SetupSuite() {
 
 func (s *ImageUploaderTestSuite) TestImageUpload() {
 	for _, tt := range s.imageUploadTests {
-		s.Run(tt.name, func(){
+		s.Run(tt.name, func() {
 			inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
 			if err != nil {
 				s.Failf("Cannot open input golden file", "%s: %v", tt.inputFile, err)
