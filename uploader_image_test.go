@@ -43,20 +43,21 @@ func (s *ImageUploaderTestSuite) SetupSuite() {
 		upload.FileType(upload.TypeGIF),
 		upload.FileType(upload.TypeHEIF),
 	}
-	commonJPEG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypeJPEG, upload.TypeJPEG))...)
-	commonPNG := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypePNG, upload.TypePNG))...)
-	commonMaxSizeOpts := upload.EvaluateOptions(append(common, upload.MaxSize(20))...)
+
+	commonJPEG := append(common, upload.ConvertTo(upload.TypeJPEG, upload.TypeJPEG))
+	commonPNG := append(common, upload.ConvertTo(upload.TypePNG, upload.TypePNG))
+	commonMaxSizeOpts := append(common, upload.MaxSize(20))
 
 	// Test cases
 	s.imageUploadTests = []imageUploadTest{
-		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, upload.NewImageUploader(commonJPEG)},
-		{"Normal PNG", "normal.png", "normal_out.png", false, false, upload.NewImageUploader(commonPNG)},
-		{"Max Size PNG", "normal.png", "normal_out.png", true, false, upload.NewImageUploader(commonMaxSizeOpts)},
-		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, upload.NewImageUploader(commonPNG)},
-		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, upload.NewImageUploader(commonJPEG)},
-		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, upload.NewImageUploader(commonPNG)},
-		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", true, false, upload.NewImageUploader(commonJPEG)},
-		{"Damaged PNG", "damaged.png", "damaged_out.png", true, false, upload.NewImageUploader(commonPNG)},
+		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, upload.NewImageUploader(commonJPEG...)},
+		{"Normal PNG", "normal.png", "normal_out.png", false, false, upload.NewImageUploader(commonPNG...)},
+		{"Max Size PNG", "normal.png", "normal_out.png", true, false, upload.NewImageUploader(commonMaxSizeOpts...)},
+		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, upload.NewImageUploader(commonPNG...)},
+		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, upload.NewImageUploader(commonJPEG...)},
+		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, upload.NewImageUploader(commonPNG...)},
+		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", true, false, upload.NewImageUploader(commonJPEG...)},
+		{"Damaged PNG", "damaged.png", "damaged_out.png", true, false, upload.NewImageUploader(commonPNG...)},
 	}
 }
 

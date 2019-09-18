@@ -7,15 +7,14 @@ import (
 )
 
 // GenericUploader is a generic uploader
-// Does not have a processor
 type GenericUploader struct {
 	Options *Options
 }
 
 // NewGenericUploader returns GenericUploader
-// Does not have a processor
-func NewGenericUploader(common *Options) *GenericUploader {
-	return &GenericUploader{Options: common}
+func NewGenericUploader(opts ...Option) *GenericUploader {
+	options := EvaluateOptions(opts...)
+	return &GenericUploader{Options: options}
 }
 
 // Upload method to satisfy uploader interface

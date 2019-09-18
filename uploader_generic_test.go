@@ -36,23 +36,22 @@ func (s *GenericUploaderTestSuite) SetupSuite() {
 		upload.FileType(upload.TypeZIP),
 	}
 
-	commonOpts := upload.EvaluateOptions(common...)
-	commonMaxSizeOpts := upload.EvaluateOptions(append(common, upload.MaxSize(300))...)
-	commonPDFMP3Opts := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypePDF, upload.TypeMP3))...)
+	commonMaxSizeOpts := append(common, upload.MaxSize(300))
+	commonPDFMP3Opts := append(common, upload.ConvertTo(upload.TypePDF, upload.TypeMP3))
 
 	// Test cases
 	s.genericUploadTests = []genericUploadTest{
-		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(commonOpts)},
-		{"PDF to MP3", "normal.pdf", "normal_convert_out.mp3", false, false, upload.NewGenericUploader(commonPDFMP3Opts)},
-		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(commonOpts)},
-		{"MP3", "normal.mp3", "normal_out.mp3", false, false, upload.NewGenericUploader(commonOpts)},
-		{"MP4", "normal.mp4", "normal_out.mp4", false, false, upload.NewGenericUploader(commonOpts)},
-		{"ZIP", "normal.zip", "normal_out.zip", false, false, upload.NewGenericUploader(commonOpts)},
-		{"ZIP (Max Size)", "normal.zip", "normal_out.zip", true, false, upload.NewGenericUploader(commonMaxSizeOpts)},
-		{"TXT (invalid)", "normal.txt", "normal_out.txt", true, false, upload.NewGenericUploader(commonOpts)},
-		{"JS (invalid)", "normal.js", "normal_out.js", true, false, upload.NewGenericUploader(commonOpts)},
-		{"PHP (invalid)", "normal.php", "normal_out.php", true, false, upload.NewGenericUploader(commonOpts)},
-		{"JPG (invalid + damaged)", "damaged.jpg", "damaged_out.php", true, false, upload.NewGenericUploader(commonOpts)},
+		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(common...)},
+		{"PDF to MP3", "normal.pdf", "normal_convert_out.mp3", false, false, upload.NewGenericUploader(commonPDFMP3Opts...)},
+		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(common...)},
+		{"MP3", "normal.mp3", "normal_out.mp3", false, false, upload.NewGenericUploader(common...)},
+		{"MP4", "normal.mp4", "normal_out.mp4", false, false, upload.NewGenericUploader(common...)},
+		{"ZIP", "normal.zip", "normal_out.zip", false, false, upload.NewGenericUploader(common...)},
+		{"ZIP (Max Size)", "normal.zip", "normal_out.zip", true, false, upload.NewGenericUploader(commonMaxSizeOpts...)},
+		{"TXT (invalid)", "normal.txt", "normal_out.txt", true, false, upload.NewGenericUploader(common...)},
+		{"JS (invalid)", "normal.js", "normal_out.js", true, false, upload.NewGenericUploader(common...)},
+		{"PHP (invalid)", "normal.php", "normal_out.php", true, false, upload.NewGenericUploader(common...)},
+		{"JPG (invalid + damaged)", "damaged.jpg", "damaged_out.php", true, false, upload.NewGenericUploader(common...)},
 	}
 }
 

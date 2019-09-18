@@ -12,8 +12,9 @@ type ImageUploader struct {
 }
 
 // NewImageUploader returns ImageUploader
-func NewImageUploader(common *Options) *ImageUploader {
-	return &ImageUploader{Options: common}
+func NewImageUploader(opts ...Option) *ImageUploader {
+	options := EvaluateOptions(opts...)
+	return &ImageUploader{Options: options}
 }
 
 // Upload method to satisfy uploader interface
