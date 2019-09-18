@@ -23,7 +23,7 @@ type imageUploadTest struct {
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	uploader             *upload.ImageUploader
+	uploader             upload.Uploader
 }
 
 type ImageUploaderTestSuite struct {
