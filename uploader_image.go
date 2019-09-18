@@ -17,7 +17,7 @@ func NewImageUploader(common *Options, opts ...OptionImage) *ImageUploader {
 }
 
 // Upload method to satisfy uploader interface
-func (u *ImageUploader) Upload(name string, content []byte) (*UploadedFile, error) {
+func (u *ImageUploader) Upload(name string, content []byte) (Uploaded, error) {
 	if !isValidImage(content) {
 		return nil, fmt.Errorf("Not a valid image")
 	}

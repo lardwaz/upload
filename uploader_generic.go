@@ -2,6 +2,7 @@ package upload
 
 import (
 	"fmt"
+
 	"github.com/h2non/filetype"
 )
 
@@ -18,7 +19,7 @@ func NewGenericUploader(common *Options) *GenericUploader {
 }
 
 // Upload method to satisfy uploader interface
-func (u *GenericUploader) Upload(name string, content []byte) (*UploadedFile, error) {
+func (u *GenericUploader) Upload(name string, content []byte) (Uploaded, error) {
 	fileType, err := filetype.Match(content)
 	if err != nil {
 		return nil, fmt.Errorf("Error retrieving file type: %v", err)
