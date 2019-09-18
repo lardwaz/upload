@@ -2,19 +2,18 @@ package upload
 
 import (
 	"fmt"
+
 	"github.com/h2non/filetype"
 )
 
 // ImageUploader is an image uploader
 type ImageUploader struct {
-	Options   *Options
-	Processor *ImageProcessor
+	Options *Options
 }
 
 // NewImageUploader returns ImageUploader
 func NewImageUploader(common *Options, opts ...OptionImage) *ImageUploader {
-	processor := NewImageProcessor(opts...)
-	return &ImageUploader{Options: common, Processor: processor}
+	return &ImageUploader{Options: common}
 }
 
 // Upload method to satisfy uploader interface
