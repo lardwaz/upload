@@ -118,16 +118,24 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 
 			select {
 			case <-time.After(3 * time.Second):
-				// We timed out!
+				// Job timed out! Did we expect?
 				if !tt.expectedProcessError {
-					s.Failf("Cannot process file", "Timed out!")
+					s.Failf("Cannot process file", "%s: Timed out!", job.File().DiskPath())
 					return
 				}
-			case <-job.Done:
+			case <-job.Done():
 				// Job done! We are good!
+
+			case err = <-job.Failed():
+				// Job failed! Did we expect?
+				if !tt.expectedProcessError {
+					s.Failf("Cannot process file", "%s: %v", job.File().DiskPath(), err)
+					return
+				}
 			}
+
 			for _, format := range tt.processor.Options().Formats() {
-				fileDiskPath := job.File.DiskPath() + "-" + format.Name()
+				fileDiskPath := job.File().DiskPath() + "-" + format.Name()
 				content, err := ioutil.ReadFile(fileDiskPath)
 				if err != nil {
 					s.Failf("Cannot open processed file", "%s: %v", fileDiskPath, err)

@@ -42,13 +42,6 @@ var (
 	_assetBox assetBoxer
 )
 
-// Job represents current image file being processed
-type Job struct {
-	File   Uploaded
-	Config *image.Config
-	Done   chan struct{}
-}
-
 type assetBoxer interface {
 	Open(string) (*os.File, error)
 }
@@ -95,7 +88,7 @@ func (p ImageProcessor) Options() OptionsImage {
 }
 
 // Process adds a job to process an image based on specific options
-func (p *ImageProcessor) Process(file Uploaded, validate bool) (*Job, error) {
+func (p *ImageProcessor) Process(file Uploaded, validate bool) (Job, error) {
 	content := file.Content()
 	if !isValidImage(content) {
 		return nil, fmt.Errorf("image type invalid")
@@ -118,18 +111,14 @@ func (p *ImageProcessor) Process(file Uploaded, validate bool) (*Job, error) {
 		return nil, fmt.Errorf("image height less than %dpx", p.options.minHeight)
 	}
 
-	job := &Job{
-		File:   file,
-		Config: &config,
-		Done:   make(chan struct{}),
-	}
+	job := NewGenericJob(file)
 
-	go p.process(job)
+	go p.process(job, &config)
 
 	return job, nil
 }
 
-func (p *ImageProcessor) process(job *Job) {
+func (p *ImageProcessor) process(job Job, config *image.Config) {
 	var (
 		img image.Image
 		err error
@@ -140,7 +129,7 @@ func (p *ImageProcessor) process(job *Job) {
 			continue
 		}
 
-		imgDiskPath := job.File.DiskPath()
+		imgDiskPath := job.File().DiskPath()
 
 		img, err = imaging.Open(imgDiskPath)
 		if err != nil {
@@ -153,11 +142,11 @@ func (p *ImageProcessor) process(job *Job) {
 		newHeight := format.height
 
 		// Do not upscale
-		if format.width > job.Config.Width {
-			newWidth = job.Config.Width
+		if format.width > config.Width {
+			newWidth = config.Width
 		}
-		if format.height > job.Config.Height {
-			newHeight = job.Config.Height
+		if format.height > config.Height {
+			newHeight = config.Height
 		}
 
 		// -1 pixel size does not exist
@@ -168,7 +157,7 @@ func (p *ImageProcessor) process(job *Job) {
 			newHeight = 0
 		}
 
-		landscape := job.Config.Height < job.Config.Width
+		landscape := config.Height < config.Width
 		preserveAspect := newWidth <= 0 || newHeight <= 0
 
 		// Do not crop and resize when using backdrop but downscale
@@ -284,5 +273,5 @@ func (p *ImageProcessor) process(job *Job) {
 		}
 	}
 
-	job.Done <- struct{}{}
+	job.SetDone()
 }
