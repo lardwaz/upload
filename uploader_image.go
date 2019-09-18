@@ -8,11 +8,11 @@ import (
 
 // ImageUploader is an image uploader
 type ImageUploader struct {
-	Options *Options
+	Options Options
 }
 
 // NewImageUploader returns ImageUploader
-func NewImageUploader(opts ...Option) *ImageUploader {
+func NewImageUploader(opts ...func(Options)) *ImageUploader {
 	options := evaluateOptions(opts...)
 	return &ImageUploader{Options: options}
 }
@@ -23,7 +23,7 @@ func (u *ImageUploader) Upload(name string, content []byte) (Uploaded, error) {
 		return nil, fmt.Errorf("Not a valid image")
 	}
 
-	uploadedFile := NewUploadedFile(name, *u.Options)
+	uploadedFile := NewUploadedFile(name, u.Options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
 		return nil, err

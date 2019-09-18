@@ -8,11 +8,11 @@ import (
 
 // GenericUploader is a generic uploader
 type GenericUploader struct {
-	Options *Options
+	Options Options
 }
 
 // NewGenericUploader returns GenericUploader
-func NewGenericUploader(opts ...Option) *GenericUploader {
+func NewGenericUploader(opts ...func(Options)) *GenericUploader {
 	options := evaluateOptions(opts...)
 	return &GenericUploader{Options: options}
 }
@@ -28,7 +28,7 @@ func (u *GenericUploader) Upload(name string, content []byte) (Uploaded, error) 
 		return nil, fmt.Errorf("Unknown file type")
 	}
 
-	uploadedFile := NewUploadedFile(name, *u.Options)
+	uploadedFile := NewUploadedFile(name, u.Options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
 		return nil, err

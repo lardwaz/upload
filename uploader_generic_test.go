@@ -26,7 +26,7 @@ type GenericUploaderTestSuite struct {
 
 func (s *GenericUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
-	common := []upload.Option{
+	common := []func(upload.Options){
 		upload.Dir(testDataFolder),
 		upload.Destination("tmp"),
 		upload.MediaPrefixURL("/" + testDataFolder + "/"),

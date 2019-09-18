@@ -83,7 +83,7 @@ func (s *ProcessorTestSuite) SetupSuite() {
 
 func (s *ProcessorTestSuite) TestImageProcess() {
 	// Common upload configurations
-	commonOpts := []upload.Option{
+	commonOpts := []func(upload.Options){
 		upload.Dir(testDataFolder),
 		upload.MediaPrefixURL("/" + testDataFolder + "/"),
 		upload.FileType(upload.TypeJPEG),

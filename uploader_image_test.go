@@ -33,7 +33,7 @@ type ImageUploaderTestSuite struct {
 
 func (s *ImageUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
-	common := []upload.Option{
+	common := []func(upload.Options){
 		upload.Dir(testDataFolder),
 		upload.Destination("tmp"),
 		upload.MediaPrefixURL("/" + testDataFolder + "/"),

@@ -14,10 +14,10 @@ type mockUploadedFile struct {
 }
 
 // NewMockUploadedFile returns a new mockUploadedFile (used for testing image processing so far)
-func NewMockUploadedFile(name string, opts ...Option) *mockUploadedFile {
+func NewMockUploadedFile(name string, opts ...func(Options)) *mockUploadedFile {
 	options := evaluateOptions(opts...)
-	dirPath := path.Join(options.dir, options.destination)
-	urlPath := path.Join(options.mediaPrefixURL, options.destination, name)
+	dirPath := path.Join(options.Dir(), options.Destination())
+	urlPath := path.Join(options.MediaPrefixURL(), options.Destination(), name)
 	diskPath := filepath.Join(dirPath, name)
 
 	content, err := ioutil.ReadFile(diskPath)

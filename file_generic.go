@@ -60,8 +60,8 @@ func (u *UploadedFile) Save(content []byte, overwrite bool) error {
 
 	// Verify size
 	size := len(content)
-	if u.options.maxSize != core.NoLimit && size > u.options.maxSize {
-		log.Printf("file %v greater than max file size: %v\n", u.diskPath, u.options.maxSize)
+	if u.options.MaxSize() != core.NoLimit && size > u.options.MaxSize() {
+		log.Printf("file %v greater than max file size: %v\n", u.diskPath, u.options.MaxSize())
 		return fmt.Errorf("file max size error")
 	}
 
