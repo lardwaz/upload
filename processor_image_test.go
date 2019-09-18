@@ -83,15 +83,15 @@ func (s *ProcessorTestSuite) SetupSuite() {
 
 func (s *ProcessorTestSuite) TestImageProcess() {
 	// Common upload configurations
-	commonOpts := upload.EvaluateOptions(
+	commonOpts := []upload.Option{
 		upload.Dir(testDataFolder),
-		upload.MediaPrefixURL("/"+testDataFolder+"/"),
+		upload.MediaPrefixURL("/" + testDataFolder + "/"),
 		upload.FileType(upload.TypeJPEG),
 		upload.FileType(upload.TypeJPEG2),
 		upload.FileType(upload.TypePNG),
 		upload.FileType(upload.TypeGIF),
 		upload.FileType(upload.TypeHEIF),
-	)
+	}
 
 	for _, tt := range s.imageProcessTests {
 		s.Run(tt.name, func() {
@@ -106,7 +106,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				core.Env = core.EnvironmentDEV
 			}
 
-			uploadedFile := upload.NewMockUploadedFile(tt.inputFile, *commonOpts)
+			uploadedFile := upload.NewMockUploadedFile(tt.inputFile, commonOpts...)
 			job, err := tt.processor.Process(uploadedFile, true)
 			if tt.expectedProcessError && err != nil {
 				// No problemo; we anticipated!
