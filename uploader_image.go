@@ -12,7 +12,7 @@ type ImageUploader struct {
 }
 
 // NewImageUploader returns ImageUploader
-func NewImageUploader(common *Options, opts ...OptionImage) *ImageUploader {
+func NewImageUploader(common *Options) *ImageUploader {
 	return &ImageUploader{Options: common}
 }
 
