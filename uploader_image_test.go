@@ -8,7 +8,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
 	"go.lsl.digital/lardwaz/upload"
+	"go.lsl.digital/lardwaz/upload/option"
+	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
 const (
@@ -33,20 +36,20 @@ type ImageUploaderTestSuite struct {
 
 func (s *ImageUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
-	common := []func(upload.Options){
-		upload.Dir(testDataFolder),
-		upload.Destination("tmp"),
-		upload.MediaPrefixURL("/" + testDataFolder + "/"),
-		upload.FileType(upload.TypeJPEG),
-		upload.FileType(upload.TypeJPEG2),
-		upload.FileType(upload.TypePNG),
-		upload.FileType(upload.TypeGIF),
-		upload.FileType(upload.TypeHEIF),
+	common := []func(sdk.Options){
+		option.Dir(testDataFolder),
+		option.Destination("tmp"),
+		option.MediaPrefixURL("/" + testDataFolder + "/"),
+		option.FileType(utypes.TypeJPEG),
+		option.FileType(utypes.TypeJPEG2),
+		option.FileType(utypes.TypePNG),
+		option.FileType(utypes.TypeGIF),
+		option.FileType(utypes.TypeHEIF),
 	}
 
-	commonJPEG := append(common, upload.ConvertTo(upload.TypeJPEG, upload.TypeJPEG))
-	commonPNG := append(common, upload.ConvertTo(upload.TypePNG, upload.TypePNG))
-	commonMaxSizeOpts := append(common, upload.MaxSize(20))
+	commonJPEG := append(common, option.ConvertTo(utypes.TypeJPEG, utypes.TypeJPEG))
+	commonPNG := append(common, option.ConvertTo(utypes.TypePNG, utypes.TypePNG))
+	commonMaxSizeOpts := append(common, option.MaxSize(20))
 
 	// Test cases
 	s.imageUploadTests = []imageUploadTest{

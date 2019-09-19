@@ -7,7 +7,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
 	"go.lsl.digital/lardwaz/upload"
+	"go.lsl.digital/lardwaz/upload/option"
+	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
 type genericUploadTest struct {
@@ -26,18 +29,18 @@ type GenericUploaderTestSuite struct {
 
 func (s *GenericUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
-	common := []func(upload.Options){
-		upload.Dir(testDataFolder),
-		upload.Destination("tmp"),
-		upload.MediaPrefixURL("/" + testDataFolder + "/"),
-		upload.FileType(upload.TypePDF),
-		upload.FileType(upload.TypeMP3),
-		upload.FileType(upload.TypeMP4),
-		upload.FileType(upload.TypeZIP),
+	common := []func(sdk.Options){
+		option.Dir(testDataFolder),
+		option.Destination("tmp"),
+		option.MediaPrefixURL("/" + testDataFolder + "/"),
+		option.FileType(utypes.TypePDF),
+		option.FileType(utypes.TypeMP3),
+		option.FileType(utypes.TypeMP4),
+		option.FileType(utypes.TypeZIP),
 	}
 
-	commonMaxSizeOpts := append(common, upload.MaxSize(300))
-	commonPDFMP3Opts := append(common, upload.ConvertTo(upload.TypePDF, upload.TypeMP3))
+	commonMaxSizeOpts := append(common, option.MaxSize(300))
+	commonPDFMP3Opts := append(common, option.ConvertTo(utypes.TypePDF, utypes.TypeMP3))
 
 	// Test cases
 	s.genericUploadTests = []genericUploadTest{

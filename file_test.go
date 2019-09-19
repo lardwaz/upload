@@ -4,18 +4,21 @@ import (
 	"io/ioutil"
 	"path"
 	"path/filepath"
+
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload/option"
 )
 
-type mockUploadedFile struct {
+type MockUploadedFile struct {
 	url      string
 	diskPath string
 	content  []byte
-	options  Options
+	options  sdk.Options
 }
 
-// NewMockUploadedFile returns a new mockUploadedFile (used for testing image processing so far)
-func NewMockUploadedFile(name string, opts ...func(Options)) *mockUploadedFile {
-	options := evaluateOptions(opts...)
+// NewMockUploadedFile returns a new MockUploadedFile (used for testing image processing so far)
+func NewMockUploadedFile(name string, opts ...func(sdk.Options)) *MockUploadedFile {
+	options := option.EvaluateOptions(opts...)
 	dirPath := path.Join(options.Dir(), options.Destination())
 	urlPath := path.Join(options.MediaPrefixURL(), options.Destination(), name)
 	diskPath := filepath.Join(dirPath, name)
@@ -25,36 +28,36 @@ func NewMockUploadedFile(name string, opts ...func(Options)) *mockUploadedFile {
 		// Nothing too bad. We are mocking! ;)
 	}
 
-	return &mockUploadedFile{
+	return &MockUploadedFile{
 		url:      urlPath,
 		diskPath: diskPath,
 		content:  content,
 	}
 }
 
-func (m *mockUploadedFile) URLPath() string {
+func (m *MockUploadedFile) URLPath() string {
 	return m.url
 }
 
-func (m *mockUploadedFile) DiskPath() string {
+func (m *MockUploadedFile) DiskPath() string {
 	return m.diskPath
 }
 
-func (m *mockUploadedFile) Content() []byte {
+func (m *MockUploadedFile) Content() []byte {
 	return m.content
 }
 
-func (m *mockUploadedFile) Save(content []byte, overwrite bool) error {
+func (m *MockUploadedFile) Save(content []byte, overwrite bool) error {
 	// Don't need an actual implementation
 	return nil
 }
 
-func (m *mockUploadedFile) Delete() error {
+func (m *MockUploadedFile) Delete() error {
 	// Don't need an actual implementation
 	return nil
 }
 
-func (m *mockUploadedFile) ChangeExt(string) error {
+func (m *MockUploadedFile) ChangeExt(string) error {
 	// Don't need an actual implementation
 	return nil
 }

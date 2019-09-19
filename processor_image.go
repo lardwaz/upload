@@ -12,7 +12,10 @@ import (
 	"os"
 
 	"github.com/disintegration/imaging"
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
 	"go.lsl.digital/lardwaz/upload/core"
+	"go.lsl.digital/lardwaz/upload/option"
+	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
 const (
@@ -69,12 +72,12 @@ func AssetBox(assetBox assetBoxer) {
 
 // ImageProcessor implements the processor interface
 type ImageProcessor struct {
-	options OptionsImage
+	options sdk.OptionsImage
 }
 
 // NewImageProcessor returns a new ImageProcessor
-func NewImageProcessor(opts ...func(OptionsImage)) ImageProcessor {
-	options := evaluateImageOptions(opts...)
+func NewImageProcessor(opts ...func(sdk.OptionsImage)) ImageProcessor {
+	options := option.EvaluateImageOptions(opts...)
 	processor := ImageProcessor{
 		options: options,
 	}
@@ -83,14 +86,14 @@ func NewImageProcessor(opts ...func(OptionsImage)) ImageProcessor {
 }
 
 // Options returns OptionsImage
-func (p ImageProcessor) Options() OptionsImage {
+func (p ImageProcessor) Options() sdk.OptionsImage {
 	return p.options
 }
 
 // Process adds a job to process an image based on specific options
 func (p *ImageProcessor) Process(file Uploaded, validate bool) (Job, error) {
 	content := file.Content()
-	if !isValidImage(content) {
+	if !utypes.IsValidImage(content) {
 		return nil, fmt.Errorf("image type invalid")
 	}
 
@@ -126,7 +129,7 @@ func (p *ImageProcessor) process(job Job, config *image.Config) {
 
 	formats := p.options.Formats()
 
-	formats.Each(func(name string, format OptionsFormat) {
+	formats.Each(func(name string, format sdk.OptionsFormat) {
 		if format.Name() == "" {
 			return
 		}

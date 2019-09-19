@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
 	"go.lsl.digital/lardwaz/upload/core"
 )
 
@@ -19,11 +20,11 @@ type UploadedFile struct {
 	url      string
 	diskPath string
 	content  []byte
-	options  Options
+	options  sdk.Options
 }
 
 // NewUploadedFile returns a new UploadedFile struct
-func NewUploadedFile(name string, opts Options) *UploadedFile {
+func NewUploadedFile(name string, opts sdk.Options) *UploadedFile {
 	dirPath := path.Join(opts.Dir(), opts.Destination())
 	name = AddTimestamp(name)
 	urlPath := path.Join(opts.MediaPrefixURL(), opts.Destination(), name)

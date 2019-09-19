@@ -1,8 +1,10 @@
-package upload
+package option
 
 import (
 	"github.com/h2non/filetype/types"
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
 	"go.lsl.digital/lardwaz/upload/core"
+	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
 var (
@@ -13,23 +15,6 @@ var (
 		convertTo:      make(map[types.Type]types.Type),
 	}
 )
-
-// Options represents a set of upload options
-type Options interface {
-	Dir() string
-	SetDir(string)
-	Destination() string
-	SetDestination(string)
-	MediaPrefixURL() string
-	SetMediaPrefixURL(string)
-	FileType() []types.Type
-	AddFileType(types.Type)
-	MaxSize() int
-	SetMaxSize(sz int)
-	ConvertTo(t types.Type) types.Type
-	SetConvertTo(old types.Type, new types.Type)
-	FileTypeExist(t types.Type) bool
-}
 
 // Opts is an implementation of Options
 type Opts struct {
@@ -78,7 +63,7 @@ func (o Opts) FileType() []types.Type {
 
 // AddFileType adds another the FileType
 func (o *Opts) AddFileType(t types.Type) {
-	if isValidType(t) && !o.FileTypeExist(t) {
+	if utypes.IsValidType(t) && !o.FileTypeExist(t) {
 		o.fileType = append(o.fileType, t)
 	}
 }
@@ -114,8 +99,8 @@ func (o Opts) FileTypeExist(t types.Type) bool {
 	return false
 }
 
-// evaluateOptions returns list of options
-func evaluateOptions(opts ...func(Options)) Options {
+// EvaluateOptions returns list of options
+func EvaluateOptions(opts ...func(sdk.Options)) sdk.Options {
 	optCopy := &Opts{}
 	*optCopy = *defaultOptions
 	for _, o := range opts {
@@ -125,43 +110,43 @@ func evaluateOptions(opts ...func(Options)) Options {
 }
 
 // Dir returns a function to change Dir
-func Dir(dir string) func(Options) {
-	return func(o Options) {
+func Dir(dir string) func(sdk.Options) {
+	return func(o sdk.Options) {
 		o.SetDir(dir)
 	}
 }
 
 // Destination returns a function to change Destination
-func Destination(dest string) func(Options) {
-	return func(o Options) {
+func Destination(dest string) func(sdk.Options) {
+	return func(o sdk.Options) {
 		o.SetDestination(dest)
 	}
 }
 
 // MediaPrefixURL returns a function to change MediaPrefixURL
-func MediaPrefixURL(url string) func(Options) {
-	return func(o Options) {
+func MediaPrefixURL(url string) func(sdk.Options) {
+	return func(o sdk.Options) {
 		o.SetMediaPrefixURL(url)
 	}
 }
 
 // FileType returns a function to change FileType
-func FileType(t types.Type) func(Options) {
-	return func(o Options) {
+func FileType(t types.Type) func(sdk.Options) {
+	return func(o sdk.Options) {
 		o.AddFileType(t)
 	}
 }
 
 // MaxSize returns a function to change MaxSize
-func MaxSize(sz int) func(Options) {
-	return func(o Options) {
+func MaxSize(sz int) func(sdk.Options) {
+	return func(o sdk.Options) {
 		o.SetMaxSize(sz)
 	}
 }
 
 // ConvertTo returns a function to change ConvertTo
-func ConvertTo(old, new types.Type) func(Options) {
-	return func(o Options) {
+func ConvertTo(old, new types.Type) func(sdk.Options) {
+	return func(o sdk.Options) {
 		o.SetConvertTo(old, new)
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"path"
 	"strings"
+
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
 )
 
 // httpImageDirHandler is an http.Handler that serves a directory.
@@ -11,7 +13,7 @@ import (
 type httpImageDirHandler struct {
 	root   http.FileSystem
 	prefix string
-	opts   OptionsImage
+	opts   sdk.OptionsImage
 }
 
 func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +23,7 @@ func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	formats := s.opts.Formats()
 
-	formats.Each(func(name string, format OptionsFormat) {
+	formats.Each(func(name string, format sdk.OptionsFormat) {
 		formatSuffix := "-" + format.Name()
 		if strings.HasSuffix(p, formatSuffix) {
 			suffix = formatSuffix

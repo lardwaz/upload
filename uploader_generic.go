@@ -4,16 +4,18 @@ import (
 	"fmt"
 
 	"github.com/h2non/filetype"
+	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload/option"
 )
 
 // GenericUploader is a generic uploader
 type GenericUploader struct {
-	Options Options
+	Options sdk.Options
 }
 
 // NewGenericUploader returns GenericUploader
-func NewGenericUploader(opts ...func(Options)) *GenericUploader {
-	options := evaluateOptions(opts...)
+func NewGenericUploader(opts ...func(sdk.Options)) *GenericUploader {
+	options := option.EvaluateOptions(opts...)
 	return &GenericUploader{Options: options}
 }
 

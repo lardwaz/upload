@@ -1,4 +1,4 @@
-package upload
+package types
 
 import (
 	"github.com/h2non/filetype"
@@ -64,20 +64,20 @@ var SupportedTypes = matchers.Map{
 	TypeWEBM: matchers.Webm,
 }
 
-// isValidType checks if type supported by file upload
-func isValidType(t types.Type) bool {
+// IsValidType checks if type supported by file upload
+func IsValidType(t types.Type) bool {
 	_, valid := SupportedTypes[t]
 	return valid
 }
 
-// isValidFile checks if file is supported by file upload
-func isValidFile(content []byte) bool {
+// IsValidFile checks if file is supported by file upload
+func IsValidFile(content []byte) bool {
 	kind := filetype.MatchMap(content, SupportedTypes)
 	return kind != types.Unknown
 }
 
-// isValidImage checks if file is an image supported by file upload
-func isValidImage(content []byte) bool {
+// IsValidImage checks if file is an image supported by file upload
+func IsValidImage(content []byte) bool {
 	return (matchers.Jpeg(content) ||
 		matchers.Jpeg2000(content) ||
 		matchers.Png(content) ||

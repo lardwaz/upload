@@ -1,30 +1,18 @@
-package upload
+package option
+
+import sdk "go.lsl.digital/lardwaz/sdk/upload"
 
 var (
 	defaultFormatOptions = &OptsFormat{}
 )
-
-// OptionsFormat represents a set of format processing options
-type OptionsFormat interface {
-	Name() string
-	SetName(n string)
-	Width() int
-	SetWidth(w int)
-	Height() int
-	SetHeight(h int)
-	Backdrop() bool
-	SetBackdrop(b bool)
-	Watermark() OptionsWatermark
-	SetWatermark(opts ...func(OptionsWatermark))
-}
 
 // OptsFormat holds dimensions options for Format
 type OptsFormat struct {
 	name      string
 	width     int
 	height    int
-	backdrop  bool             // (default: false) If true, will add a backdrop
-	watermark OptionsWatermark // (default: nil) If not nil, will overlay an image as watermark at X,Y pos +-OffsetX,OffsetY
+	backdrop  bool                 // (default: false) If true, will add a backdrop
+	watermark sdk.OptionsWatermark // (default: nil) If not nil, will overlay an image as watermark at X,Y pos +-OffsetX,OffsetY
 }
 
 // Name returns Name
@@ -68,17 +56,17 @@ func (o *OptsFormat) SetBackdrop(b bool) {
 }
 
 // Watermark returns Watermark
-func (o OptsFormat) Watermark() OptionsWatermark {
+func (o OptsFormat) Watermark() sdk.OptionsWatermark {
 	return o.watermark
 }
 
 // SetWatermark sets the watermark
-func (o *OptsFormat) SetWatermark(opts ...func(OptionsWatermark)) {
-	o.watermark = evaluateWatermarkOptions(opts...)
+func (o *OptsFormat) SetWatermark(opts ...func(sdk.OptionsWatermark)) {
+	o.watermark = EvaluateWatermarkOptions(opts...)
 }
 
-// evaluateFormatOptions returns optionsImage
-func evaluateFormatOptions(opts ...func(OptionsFormat)) OptionsFormat {
+// EvaluateFormatOptions returns optionsImage
+func EvaluateFormatOptions(opts ...func(sdk.OptionsFormat)) sdk.OptionsFormat {
 	optCopy := &OptsFormat{}
 	*optCopy = *defaultFormatOptions
 	for _, o := range opts {
@@ -88,36 +76,36 @@ func evaluateFormatOptions(opts ...func(OptionsFormat)) OptionsFormat {
 }
 
 // FormatName returns a function to modify format Name
-func FormatName(n string) func(OptionsFormat) {
-	return func(o OptionsFormat) {
+func FormatName(n string) func(sdk.OptionsFormat) {
+	return func(o sdk.OptionsFormat) {
 		o.SetName(n)
 	}
 }
 
 // FormatWidth returns a function to modify format Width
-func FormatWidth(w int) func(OptionsFormat) {
-	return func(o OptionsFormat) {
+func FormatWidth(w int) func(sdk.OptionsFormat) {
+	return func(o sdk.OptionsFormat) {
 		o.SetWidth(w)
 	}
 }
 
 // FormatHeight returns a function to modify format Height
-func FormatHeight(h int) func(OptionsFormat) {
-	return func(o OptionsFormat) {
+func FormatHeight(h int) func(sdk.OptionsFormat) {
+	return func(o sdk.OptionsFormat) {
 		o.SetHeight(h)
 	}
 }
 
 // FormatBackdrop returns a function to modify format Backdrop
-func FormatBackdrop(b bool) func(OptionsFormat) {
-	return func(o OptionsFormat) {
+func FormatBackdrop(b bool) func(sdk.OptionsFormat) {
+	return func(o sdk.OptionsFormat) {
 		o.SetBackdrop(b)
 	}
 }
 
 // FormatWatermark returns a function to modify format watermark
-func FormatWatermark(opts ...func(OptionsWatermark)) func(OptionsFormat) {
-	return func(o OptionsFormat) {
+func FormatWatermark(opts ...func(sdk.OptionsWatermark)) func(sdk.OptionsFormat) {
+	return func(o sdk.OptionsFormat) {
 		o.SetWatermark(opts...)
 	}
 }
