@@ -37,17 +37,9 @@ const (
 )
 
 var (
-	// Disk paths to static assets
-	_diskPathWatermark string
-	_diskPathBackdrop  string
-
 	// _assetBox satisfies the AssetBoxer interface
-	_assetBox assetBoxer
+	_assetBox sdk.AssetBoxer
 )
-
-type assetBoxer interface {
-	Open(string) (*os.File, error)
-}
 
 func init() {
 	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
@@ -55,18 +47,8 @@ func init() {
 	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
 }
 
-// BackdropImage sets the disk path for backdrop images
-func BackdropImage(path string) {
-	_diskPathBackdrop = path
-}
-
-// WatermarkImage sets the disk path for watermark images
-func WatermarkImage(path string) {
-	_diskPathWatermark = path
-}
-
 // AssetBox sets the asset box to retrieve static assets
-func AssetBox(assetBox assetBoxer) {
+func AssetBox(assetBox sdk.AssetBoxer) {
 	_assetBox = assetBox
 }
 
@@ -166,17 +148,18 @@ func (p *ImageProcessor) process(job sdk.Job, config *image.Config) {
 		preserveAspect := newWidth <= 0 || newHeight <= 0
 
 		// Do not crop and resize when using backdrop but downscale
-		if _diskPathBackdrop != "" && format.Backdrop() && !landscape {
+		if format.Backdrop() != nil && format.Backdrop().Path() != "" && !landscape {
+			diskPathBackdrop := format.Backdrop().Path()
 			// Scale down srcImage to fit the bounding box
 			img = imaging.Fit(img, newWidth, newHeight, imaging.Lanczos)
 
 			// Open a new image to use as backdrop layer
 			var back image.Image
 			if core.Env == core.EnvironmentDEV {
-				back, err = imaging.Open(_diskPathBackdrop + "-" + format.Name())
+				back, err = imaging.Open(diskPathBackdrop + "-" + format.Name())
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(_diskPathBackdrop + "-" + format.Name())
+				staticAsset, err = _assetBox.Open(diskPathBackdrop + "-" + format.Name())
 				if err != nil {
 					// if err, fall back to a blue background backdrop
 					back = imaging.New(format.Width(), format.Height(), color.NRGBA{0, 29, 56, 0})
@@ -203,13 +186,14 @@ func (p *ImageProcessor) process(job sdk.Job, config *image.Config) {
 			img = imaging.Fill(img, newWidth, newHeight, imaging.Center, imaging.Lanczos)
 		}
 
-		if _diskPathWatermark != "" && format.Watermark() != nil {
+		if format.Watermark() != nil && format.Watermark().Path() != "" {
+			diskPathWatermark := format.Watermark().Path()
 			var watermark image.Image
 			if core.Env == core.EnvironmentDEV {
-				watermark, err = imaging.Open(_diskPathWatermark + "-" + format.Name())
+				watermark, err = imaging.Open(diskPathWatermark + "-" + format.Name())
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(_diskPathWatermark + "-" + format.Name())
+				staticAsset, err = _assetBox.Open(diskPathWatermark + "-" + format.Name())
 				if err != nil {
 					log.Printf("Watermark not found: %v", err)
 					return

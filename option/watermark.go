@@ -8,10 +8,21 @@ var (
 
 // OptsWatermark is an implementation of OptionsWatermark
 type OptsWatermark struct {
+	path       string
 	horizontal int
 	vertical   int
 	offsetX    int
 	offsetY    int
+}
+
+// Path returns Path
+func (o *OptsWatermark) Path() string {
+	return o.path
+}
+
+// SetPath sets Path
+func (o *OptsWatermark) SetPath(p string) {
+	o.path = p
 }
 
 // Horizontal returns Horizontal
@@ -62,6 +73,13 @@ func EvaluateWatermarkOptions(opts ...func(sdk.OptionsWatermark)) sdk.OptionsWat
 		o(optCopy)
 	}
 	return optCopy
+}
+
+// WatermarkPath returns OptionWatermark to modify WatermarkPath
+func WatermarkPath(p string) func(sdk.OptionsWatermark) {
+	return func(o sdk.OptionsWatermark) {
+		o.SetPath(p)
+	}
 }
 
 // WatermarkHorizontal returns OptionWatermark to modify WatermarkHorizontal

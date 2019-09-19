@@ -11,7 +11,7 @@ type OptsFormat struct {
 	name      string
 	width     int
 	height    int
-	backdrop  bool                 // (default: false) If true, will add a backdrop
+	backdrop  sdk.OptionsBackdrop  // (default: nil) If not nil, will add a backdrop
 	watermark sdk.OptionsWatermark // (default: nil) If not nil, will overlay an image as watermark at X,Y pos +-OffsetX,OffsetY
 }
 
@@ -46,13 +46,13 @@ func (o *OptsFormat) SetHeight(h int) {
 }
 
 // Backdrop returns Backdrop
-func (o OptsFormat) Backdrop() bool {
+func (o OptsFormat) Backdrop() sdk.OptionsBackdrop {
 	return o.backdrop
 }
 
 // SetBackdrop sets the Backdrop
-func (o *OptsFormat) SetBackdrop(b bool) {
-	o.backdrop = b
+func (o *OptsFormat) SetBackdrop(opts ...func(sdk.OptionsBackdrop)) {
+	o.backdrop = EvaluateBackdropOptions(opts...)
 }
 
 // Watermark returns Watermark
@@ -97,9 +97,9 @@ func FormatHeight(h int) func(sdk.OptionsFormat) {
 }
 
 // FormatBackdrop returns a function to modify format Backdrop
-func FormatBackdrop(b bool) func(sdk.OptionsFormat) {
+func FormatBackdrop(opts ...func(sdk.OptionsBackdrop)) func(sdk.OptionsFormat) {
 	return func(o sdk.OptionsFormat) {
-		o.SetBackdrop(b)
+		o.SetBackdrop(opts...)
 	}
 }
 
