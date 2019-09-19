@@ -26,7 +26,7 @@ type imageUploadTest struct {
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	uploader             upload.Uploader
+	uploader             sdk.Uploader
 }
 
 type ImageUploaderTestSuite struct {
@@ -112,7 +112,7 @@ func (s *ImageUploaderTestSuite) TestImageUpload() {
 			}
 
 			// Check if file content valid
-			s.Equalf(expectedContent, content, "Uploaded content invalid")
+			s.Equalf(expectedContent, content, "sdk.Uploaded content invalid")
 		})
 	}
 }

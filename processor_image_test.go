@@ -121,16 +121,16 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 
 			select {
 			case <-time.After(3 * time.Second):
-				// Job timed out! Did we expect?
+				// sdk.Job timed out! Did we expect?
 				if !tt.expectedProcessError {
 					s.Failf("Cannot process file", "%s: Timed out!", job.File().DiskPath())
 					return
 				}
 			case <-job.Done():
-			// Job done! We are good!
+			// sdk.Job done! We are good!
 
 			case err = <-job.Failed():
-				// Job failed! Did we expect?
+				// sdk.Job failed! Did we expect?
 				if !tt.expectedProcessError {
 					s.Failf("Cannot process file", "%s: %v", job.File().DiskPath(), err)
 					return
@@ -169,7 +169,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				}
 
 				// Check if file content valid
-				s.Equalf(expectedContent, content, "Uploaded content invalid")
+				s.Equalf(expectedContent, content, "sdk.Uploaded content invalid")
 			})
 		})
 	}

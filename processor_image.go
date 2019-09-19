@@ -91,7 +91,7 @@ func (p ImageProcessor) Options() sdk.OptionsImage {
 }
 
 // Process adds a job to process an image based on specific options
-func (p *ImageProcessor) Process(file Uploaded, validate bool) (Job, error) {
+func (p *ImageProcessor) Process(file sdk.Uploaded, validate bool) (sdk.Job, error) {
 	content := file.Content()
 	if !utypes.IsValidImage(content) {
 		return nil, fmt.Errorf("image type invalid")
@@ -121,7 +121,7 @@ func (p *ImageProcessor) Process(file Uploaded, validate bool) (Job, error) {
 	return job, nil
 }
 
-func (p *ImageProcessor) process(job Job, config *image.Config) {
+func (p *ImageProcessor) process(job sdk.Job, config *image.Config) {
 	var (
 		img image.Image
 		err error

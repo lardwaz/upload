@@ -106,7 +106,7 @@ func (s *GenericUploaderTestSuite) TestGenericUpload() {
 			}
 
 			// Check if file content valid
-			s.Equalf(expectedContent, content, "Uploaded content invalid")
+			s.Equalf(expectedContent, content, "sdk.Uploaded content invalid")
 		})
 	}
 }
