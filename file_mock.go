@@ -9,6 +9,7 @@ import (
 	"go.lsl.digital/lardwaz/upload/option"
 )
 
+// MockUploadedFile is a mock implementation of Uploaded
 type MockUploadedFile struct {
 	url      string
 	diskPath string
@@ -35,28 +36,34 @@ func NewMockUploadedFile(name string, opts ...func(sdk.Options)) *MockUploadedFi
 	}
 }
 
+// URLPath returns the URLPath
 func (m *MockUploadedFile) URLPath() string {
 	return m.url
 }
 
+// DiskPath returns the DiskPath
 func (m *MockUploadedFile) DiskPath() string {
 	return m.diskPath
 }
 
+// Content returns the Content
 func (m *MockUploadedFile) Content() []byte {
 	return m.content
 }
 
+// Save returns the Save
 func (m *MockUploadedFile) Save(content []byte, overwrite bool) error {
 	// Don't need an actual implementation
 	return nil
 }
 
+// Delete returns the Delete
 func (m *MockUploadedFile) Delete() error {
 	// Don't need an actual implementation
 	return nil
 }
 
+// ChangeExt returns the ChangeExt
 func (m *MockUploadedFile) ChangeExt(string) error {
 	// Don't need an actual implementation
 	return nil
