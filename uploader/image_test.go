@@ -1,65 +1,71 @@
-package upload_test
+package uploader_test
 
 // Basic imports
 import (
+	"flag"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
-	"go.lsl.digital/lardwaz/upload"
 	"go.lsl.digital/lardwaz/upload/option"
 	utypes "go.lsl.digital/lardwaz/upload/types"
+	"go.lsl.digital/lardwaz/upload/uploader"
 )
 
-type genericUploadTest struct {
+const (
+	testDataFolder = "../testdata"
+)
+
+var update = flag.Bool("update", false, "update golden files")
+
+type imageUploadTest struct {
 	name                 string
 	inputFile            string
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	uploader             *upload.GenericUploader
+	uploader             sdk.Uploader
 }
 
-type GenericUploaderTestSuite struct {
+type ImageUploaderTestSuite struct {
 	suite.Suite
-	genericUploadTests []genericUploadTest
+	imageUploadTests []imageUploadTest
 }
 
-func (s *GenericUploaderTestSuite) SetupSuite() {
+func (s *ImageUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
 	common := []func(sdk.Options){
 		option.Dir(testDataFolder),
 		option.Destination("tmp"),
 		option.MediaPrefixURL("/" + testDataFolder + "/"),
-		option.FileType(utypes.TypePDF),
-		option.FileType(utypes.TypeMP3),
-		option.FileType(utypes.TypeMP4),
-		option.FileType(utypes.TypeZIP),
+		option.FileType(utypes.TypeJPEG),
+		option.FileType(utypes.TypeJPEG2),
+		option.FileType(utypes.TypePNG),
+		option.FileType(utypes.TypeGIF),
+		option.FileType(utypes.TypeHEIF),
 	}
 
-	commonMaxSizeOpts := append(common, option.MaxSize(300))
-	commonPDFMP3Opts := append(common, option.ConvertTo(utypes.TypePDF, utypes.TypeMP3))
+	commonJPEG := append(common, option.ConvertTo(utypes.TypeJPEG, utypes.TypeJPEG))
+	commonPNG := append(common, option.ConvertTo(utypes.TypePNG, utypes.TypePNG))
+	commonMaxSizeOpts := append(common, option.MaxSize(20))
 
 	// Test cases
-	s.genericUploadTests = []genericUploadTest{
-		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(common...)},
-		{"PDF to MP3", "normal.pdf", "normal_convert_out.mp3", false, false, upload.NewGenericUploader(commonPDFMP3Opts...)},
-		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(common...)},
-		{"MP3", "normal.mp3", "normal_out.mp3", false, false, upload.NewGenericUploader(common...)},
-		{"MP4", "normal.mp4", "normal_out.mp4", false, false, upload.NewGenericUploader(common...)},
-		{"ZIP", "normal.zip", "normal_out.zip", false, false, upload.NewGenericUploader(common...)},
-		{"ZIP (Max Size)", "normal.zip", "normal_out.zip", true, false, upload.NewGenericUploader(commonMaxSizeOpts...)},
-		{"TXT (invalid)", "normal.txt", "normal_out.txt", true, false, upload.NewGenericUploader(common...)},
-		{"JS (invalid)", "normal.js", "normal_out.js", true, false, upload.NewGenericUploader(common...)},
-		{"PHP (invalid)", "normal.php", "normal_out.php", true, false, upload.NewGenericUploader(common...)},
-		{"JPG (invalid + damaged)", "damaged.jpg", "damaged_out.php", true, false, upload.NewGenericUploader(common...)},
+	s.imageUploadTests = []imageUploadTest{
+		{"Normal JPG", "normal.jpg", "normal_out.jpg", false, false, uploader.NewImage(commonJPEG...)},
+		{"Normal PNG", "normal.png", "normal_out.png", false, false, uploader.NewImage(commonPNG...)},
+		{"Max Size PNG", "normal.png", "normal_out.png", true, false, uploader.NewImage(commonMaxSizeOpts...)},
+		{"Transparent PNG", "transparent.png", "transparent_out.png", false, false, uploader.NewImage(commonPNG...)},
+		{"Malformed JPG", "malformed.jpg", "malformed_out.jpg", false, false, uploader.NewImage(commonJPEG...)},
+		{"Malformed PNG", "malformed.png", "malformed_out.png", false, false, uploader.NewImage(commonPNG...)},
+		{"Damaged JPG", "damaged.jpg", "damaged_out.jpg", true, false, uploader.NewImage(commonJPEG...)},
+		{"Damaged PNG", "damaged.png", "damaged_out.png", true, false, uploader.NewImage(commonPNG...)},
 	}
 }
 
-func (s *GenericUploaderTestSuite) TestGenericUpload() {
-	for _, tt := range s.genericUploadTests {
+func (s *ImageUploaderTestSuite) TestImageUpload() {
+	for _, tt := range s.imageUploadTests {
 		s.Run(tt.name, func() {
 			inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
 			if err != nil {
@@ -111,6 +117,6 @@ func (s *GenericUploaderTestSuite) TestGenericUpload() {
 	}
 }
 
-func TestGenericUploaderTestSuite(t *testing.T) {
-	suite.Run(t, new(GenericUploaderTestSuite))
+func TestImageUploaderTestSuite(t *testing.T) {
+	suite.Run(t, new(ImageUploaderTestSuite))
 }

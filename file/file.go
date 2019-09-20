@@ -1,4 +1,4 @@
-package upload
+package file
 
 import (
 	"fmt"
@@ -15,23 +15,23 @@ import (
 	"go.lsl.digital/lardwaz/upload/core"
 )
 
-// UploadedFile implements File interface
-type UploadedFile struct {
+// Uploaded implements File interface
+type Uploaded struct {
 	url      string
 	diskPath string
 	content  []byte
 	options  sdk.Options
 }
 
-// NewUploadedFile returns a new UploadedFile struct
-func NewUploadedFile(name string, opts sdk.Options) *UploadedFile {
+// NewUploaded returns a new Uploaded struct
+func NewUploaded(name string, opts sdk.Options) *Uploaded {
 	dirPath := path.Join(opts.Dir(), opts.Destination())
 	name = AddTimestamp(name)
 	urlPath := path.Join(opts.MediaPrefixURL(), opts.Destination(), name)
 	currentTime := time.Now()
 	diskPath := filepath.Join(dirPath, fmt.Sprintf("%d", currentTime.Year()), fmt.Sprintf("%v", currentTime.Month()), name)
 
-	return &UploadedFile{
+	return &Uploaded{
 		url:      urlPath,
 		diskPath: diskPath,
 		options:  opts,
@@ -39,22 +39,22 @@ func NewUploadedFile(name string, opts sdk.Options) *UploadedFile {
 }
 
 // URLPath returns the url path of file
-func (u *UploadedFile) URLPath() string {
+func (u *Uploaded) URLPath() string {
 	return u.url
 }
 
 // DiskPath returns the path of file on disk
-func (u *UploadedFile) DiskPath() string {
+func (u *Uploaded) DiskPath() string {
 	return u.diskPath
 }
 
 // Content returns the path of file on disk
-func (u *UploadedFile) Content() []byte {
+func (u *Uploaded) Content() []byte {
 	return u.content
 }
 
 // Save saves file on disk if it does not exist
-func (u *UploadedFile) Save(content []byte, overwrite bool) error {
+func (u *Uploaded) Save(content []byte, overwrite bool) error {
 	if !overwrite {
 		return nil
 	}
@@ -84,7 +84,7 @@ func (u *UploadedFile) Save(content []byte, overwrite bool) error {
 }
 
 // Delete deletes one file on disk
-func (u *UploadedFile) Delete() error {
+func (u *Uploaded) Delete() error {
 	if err := os.Remove(u.DiskPath()); err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func (u *UploadedFile) Delete() error {
 }
 
 // ChangeExt changes the extension of file on disk
-func (u *UploadedFile) ChangeExt(newExt string) error {
+func (u *Uploaded) ChangeExt(newExt string) error {
 	if newExt == "" {
 		return nil
 	}

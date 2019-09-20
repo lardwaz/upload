@@ -1,4 +1,4 @@
-package upload
+package file
 
 import (
 	"io/ioutil"
@@ -9,16 +9,16 @@ import (
 	"go.lsl.digital/lardwaz/upload/option"
 )
 
-// MockUploadedFile is a mock implementation of Uploaded
-type MockUploadedFile struct {
+// MockUploaded is a mock implementation of Uploaded
+type MockUploaded struct {
 	url      string
 	diskPath string
 	content  []byte
 	options  sdk.Options
 }
 
-// NewMockUploadedFile returns a new MockUploadedFile (used for testing image processing so far)
-func NewMockUploadedFile(name string, opts ...func(sdk.Options)) *MockUploadedFile {
+// NewMockUploaded returns a new MockUploaded (used for testing image processing so far)
+func NewMockUploaded(name string, opts ...func(sdk.Options)) *MockUploaded {
 	options := option.EvaluateOptions(opts...)
 	dirPath := path.Join(options.Dir(), options.Destination())
 	urlPath := path.Join(options.MediaPrefixURL(), options.Destination(), name)
@@ -29,7 +29,7 @@ func NewMockUploadedFile(name string, opts ...func(sdk.Options)) *MockUploadedFi
 		// Nothing too bad. We are mocking! ;)
 	}
 
-	return &MockUploadedFile{
+	return &MockUploaded{
 		url:      urlPath,
 		diskPath: diskPath,
 		content:  content,
@@ -37,34 +37,34 @@ func NewMockUploadedFile(name string, opts ...func(sdk.Options)) *MockUploadedFi
 }
 
 // URLPath returns the URLPath
-func (m *MockUploadedFile) URLPath() string {
+func (m *MockUploaded) URLPath() string {
 	return m.url
 }
 
 // DiskPath returns the DiskPath
-func (m *MockUploadedFile) DiskPath() string {
+func (m *MockUploaded) DiskPath() string {
 	return m.diskPath
 }
 
 // Content returns the Content
-func (m *MockUploadedFile) Content() []byte {
+func (m *MockUploaded) Content() []byte {
 	return m.content
 }
 
 // Save returns the Save
-func (m *MockUploadedFile) Save(content []byte, overwrite bool) error {
+func (m *MockUploaded) Save(content []byte, overwrite bool) error {
 	// Don't need an actual implementation
 	return nil
 }
 
 // Delete returns the Delete
-func (m *MockUploadedFile) Delete() error {
+func (m *MockUploaded) Delete() error {
 	// Don't need an actual implementation
 	return nil
 }
 
 // ChangeExt returns the ChangeExt
-func (m *MockUploadedFile) ChangeExt(string) error {
+func (m *MockUploaded) ChangeExt(string) error {
 	// Don't need an actual implementation
 	return nil
 }

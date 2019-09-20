@@ -1,4 +1,4 @@
-package upload
+package handler
 
 import (
 	"net/http"
@@ -8,20 +8,20 @@ import (
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
 )
 
-// httpImageDirHandler is an http.Handler that serves a directory.
+// HTTPImageDir is an http.Handler that serves a directory.
 // If a generated file is missing, it yields a temporary redirect to the original file.
-type httpImageDirHandler struct {
+type HTTPImageDir struct {
 	root   http.FileSystem
 	prefix string
 	opts   sdk.OptionsImage
 }
 
-func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h HTTPImageDir) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p := r.URL.Path
 
 	var suffix string
 
-	formats := s.opts.Formats()
+	formats := h.opts.Formats()
 
 	formats.Each(func(name string, format sdk.OptionsFormat) {
 		formatSuffix := "-" + format.Name()
@@ -39,7 +39,7 @@ func (s httpImageDirHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	noSuffix := strings.TrimSuffix(p, suffix)
-	p = path.Join(s.prefix, noSuffix)
+	p = path.Join(h.prefix, noSuffix)
 
 	http.Redirect(w, r, p, http.StatusTemporaryRedirect)
 }

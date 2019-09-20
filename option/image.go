@@ -1,8 +1,6 @@
 package option
 
 import (
-	"log"
-
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
 	"go.lsl.digital/lardwaz/upload/core"
 )
@@ -82,8 +80,6 @@ func Formats(opts ...func(sdk.OptionsFormat)) func(sdk.OptionsImage) {
 		format := EvaluateFormatOptions(opts...)
 
 		formats := o.Formats()
-
-		log.Println("Formats", formats)
 
 		formats.Set(format)
 

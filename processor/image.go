@@ -1,4 +1,4 @@
-package upload
+package processor
 
 import (
 	"bytes"
@@ -14,7 +14,9 @@ import (
 	"github.com/disintegration/imaging"
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
 	"go.lsl.digital/lardwaz/upload/core"
+	"go.lsl.digital/lardwaz/upload/job"
 	"go.lsl.digital/lardwaz/upload/option"
+	"go.lsl.digital/lardwaz/upload/processor/position"
 	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
@@ -25,15 +27,6 @@ const (
 	TypeImageJPEG = "jpeg"
 	// TypeImagePNG denotes image of file type png
 	TypeImagePNG = "png"
-)
-
-// Anchor points for X,Y
-const (
-	Left = iota
-	Right
-	Top
-	Bottom
-	Center
 )
 
 var (
@@ -52,15 +45,15 @@ func AssetBox(assetBox sdk.AssetBoxer) {
 	_assetBox = assetBox
 }
 
-// ImageProcessor implements the processor interface
-type ImageProcessor struct {
+// Image implements the processor interface
+type Image struct {
 	options sdk.OptionsImage
 }
 
-// NewImageProcessor returns a new ImageProcessor
-func NewImageProcessor(opts ...func(sdk.OptionsImage)) ImageProcessor {
+// NewImage returns a new Image
+func NewImage(opts ...func(sdk.OptionsImage)) Image {
 	options := option.EvaluateImageOptions(opts...)
-	processor := ImageProcessor{
+	processor := Image{
 		options: options,
 	}
 
@@ -68,12 +61,12 @@ func NewImageProcessor(opts ...func(sdk.OptionsImage)) ImageProcessor {
 }
 
 // Options returns OptionsImage
-func (p ImageProcessor) Options() sdk.OptionsImage {
+func (p Image) Options() sdk.OptionsImage {
 	return p.options
 }
 
 // Process adds a job to process an image based on specific options
-func (p *ImageProcessor) Process(file sdk.Uploaded, validate bool) (sdk.Job, error) {
+func (p *Image) Process(file sdk.Uploaded, validate bool) (sdk.Job, error) {
 	content := file.Content()
 	if !utypes.IsValidImage(content) {
 		return nil, fmt.Errorf("image type invalid")
@@ -96,14 +89,14 @@ func (p *ImageProcessor) Process(file sdk.Uploaded, validate bool) (sdk.Job, err
 		return nil, fmt.Errorf("image height less than %dpx", p.options.MinHeight())
 	}
 
-	job := NewGenericJob(file)
+	job := job.NewGeneric(file)
 
 	go p.process(job, &config)
 
 	return job, nil
 }
 
-func (p *ImageProcessor) process(job sdk.Job, config *image.Config) {
+func (p *Image) process(job sdk.Job, config *image.Config) {
 	var (
 		img image.Image
 		err error
@@ -214,28 +207,28 @@ func (p *ImageProcessor) process(job sdk.Job, config *image.Config) {
 
 				switch format.Watermark().Horizontal() {
 				default:
-					format.Watermark().SetHorizontal(Left)
+					format.Watermark().SetHorizontal(position.Left)
 					fallthrough
-				case Left:
+				case position.Left:
 					watermarkPos.X += format.Watermark().OffsetX()
-				case Right:
+				case position.Right:
 					RightX := bgBounds.Min.X + bgW - watermarkW
 					watermarkPos.X = RightX - format.Watermark().OffsetX()
-				case Center:
+				case position.Center:
 					CenterX := bgBounds.Min.X + bgW/2
 					watermarkPos.X = CenterX - watermarkW/2 + format.Watermark().OffsetX()
 				}
 
 				switch format.Watermark().Vertical() {
 				default:
-					format.Watermark().SetVertical(Top)
+					format.Watermark().SetVertical(position.Top)
 					fallthrough
-				case Top:
+				case position.Top:
 					watermarkPos.Y += format.Watermark().OffsetY()
-				case Bottom:
+				case position.Bottom:
 					BottomY := bgBounds.Min.Y + bgH - watermarkH
 					watermarkPos.Y = BottomY - format.Watermark().OffsetY()
-				case Center:
+				case position.Center:
 					CenterY := bgBounds.Min.Y + bgH/2
 					watermarkPos.Y = CenterY - watermarkH/2 + format.Watermark().OffsetY()
 				}
