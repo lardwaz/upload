@@ -87,7 +87,7 @@ func Formats(opts ...func(sdk.OptionsFormat)) func(sdk.OptionsImage) {
 	}
 }
 
-// PROD returns OptionsImage to modify ENV
+// PROD returns a function to modify ENV
 func PROD() func(sdk.OptionsImage) {
 	return func(o sdk.OptionsImage) {
 		o.SetPROD(true)
