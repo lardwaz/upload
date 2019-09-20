@@ -16,6 +16,7 @@ import (
 	"go.lsl.digital/lardwaz/upload/core"
 	"go.lsl.digital/lardwaz/upload/job"
 	"go.lsl.digital/lardwaz/upload/option"
+	"go.lsl.digital/lardwaz/upload/processor/box"
 	"go.lsl.digital/lardwaz/upload/processor/position"
 	utypes "go.lsl.digital/lardwaz/upload/types"
 )
@@ -29,20 +30,10 @@ const (
 	TypeImagePNG = "png"
 )
 
-var (
-	// _assetBox satisfies the AssetBoxer interface
-	_assetBox sdk.AssetBoxer
-)
-
 func init() {
 	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
-}
-
-// AssetBox sets the asset box to retrieve static assets
-func AssetBox(assetBox sdk.AssetBoxer) {
-	_assetBox = assetBox
 }
 
 // Image implements the processor interface
@@ -152,7 +143,7 @@ func (p *Image) process(job sdk.Job, config *image.Config) {
 				back, err = imaging.Open(diskPathBackdrop + "-" + format.Name())
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(diskPathBackdrop + "-" + format.Name())
+				staticAsset, err = box.Asset.Open(diskPathBackdrop + "-" + format.Name())
 				if err != nil {
 					// if err, fall back to a blue background backdrop
 					back = imaging.New(format.Width(), format.Height(), color.NRGBA{0, 29, 56, 0})
@@ -186,7 +177,7 @@ func (p *Image) process(job sdk.Job, config *image.Config) {
 				watermark, err = imaging.Open(diskPathWatermark + "-" + format.Name())
 			} else {
 				var staticAsset *os.File
-				staticAsset, err = _assetBox.Open(diskPathWatermark + "-" + format.Name())
+				staticAsset, err = box.Asset.Open(diskPathWatermark + "-" + format.Name())
 				if err != nil {
 					log.Printf("Watermark not found: %v", err)
 					return

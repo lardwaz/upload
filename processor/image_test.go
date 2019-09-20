@@ -15,6 +15,7 @@ import (
 	"go.lsl.digital/lardwaz/upload/file"
 	"go.lsl.digital/lardwaz/upload/option"
 	"go.lsl.digital/lardwaz/upload/processor"
+	"go.lsl.digital/lardwaz/upload/processor/box"
 	"go.lsl.digital/lardwaz/upload/processor/position"
 	utypes "go.lsl.digital/lardwaz/upload/types"
 )
@@ -24,16 +25,6 @@ const (
 )
 
 var update = flag.Bool("update", false, "update golden files")
-
-type mockAssetBoxer struct{}
-
-func NewMockAssetBoxer() *mockAssetBoxer {
-	return &mockAssetBoxer{}
-}
-
-func (m *mockAssetBoxer) Open(name string) (*os.File, error) {
-	return os.Open(name)
-}
 
 type imageProcessTest struct {
 	name                 string
@@ -55,7 +46,7 @@ func (s *ProcessorTestSuite) SetupSuite() {
 	backdropOptPath := option.BackdropPath(filepath.Join(testDataFolder, "backdrops", "test_backdrop.jpg"))
 
 	// Set asset box
-	processor.AssetBox(NewMockAssetBoxer())
+	box.Set(box.NewMockAsset())
 
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
