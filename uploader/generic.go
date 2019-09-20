@@ -31,7 +31,7 @@ func (u *Generic) Upload(name string, content []byte) (sdk.Uploaded, error) {
 		return nil, fmt.Errorf("Unknown file type")
 	}
 
-	uploadedFile := file.NewUploaded(name, u.Options)
+	uploadedFile := file.NewGeneric(name, u.Options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
 		return nil, err

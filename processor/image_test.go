@@ -118,7 +118,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				core.Env = core.EnvironmentDEV
 			}
 
-			uploadedFile := file.NewMockUploaded(tt.inputFile, commonOpts...)
+			uploadedFile := file.NewMockGeneric(tt.inputFile, commonOpts...)
 			job, err := tt.processor.Process(uploadedFile, true)
 			if tt.expectedProcessError && err != nil {
 				// No problemo; we anticipated!

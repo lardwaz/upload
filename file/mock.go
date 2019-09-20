@@ -9,16 +9,16 @@ import (
 	"go.lsl.digital/lardwaz/upload/option"
 )
 
-// MockUploaded is a mock implementation of Uploaded
-type MockUploaded struct {
+// MockGeneric is a mock implementation of Generic
+type MockGeneric struct {
 	url      string
 	diskPath string
 	content  []byte
 	options  sdk.Options
 }
 
-// NewMockUploaded returns a new MockUploaded (used for testing image processing so far)
-func NewMockUploaded(name string, opts ...func(sdk.Options)) *MockUploaded {
+// NewMockGeneric returns a new MockGeneric (used for testing image processing so far)
+func NewMockGeneric(name string, opts ...func(sdk.Options)) *MockGeneric {
 	options := option.EvaluateOptions(opts...)
 	dirPath := path.Join(options.Dir(), options.Destination())
 	urlPath := path.Join(options.MediaPrefixURL(), options.Destination(), name)
@@ -29,7 +29,7 @@ func NewMockUploaded(name string, opts ...func(sdk.Options)) *MockUploaded {
 		// Nothing too bad. We are mocking! ;)
 	}
 
-	return &MockUploaded{
+	return &MockGeneric{
 		url:      urlPath,
 		diskPath: diskPath,
 		content:  content,
@@ -37,34 +37,34 @@ func NewMockUploaded(name string, opts ...func(sdk.Options)) *MockUploaded {
 }
 
 // URLPath returns the URLPath
-func (m *MockUploaded) URLPath() string {
+func (m *MockGeneric) URLPath() string {
 	return m.url
 }
 
 // DiskPath returns the DiskPath
-func (m *MockUploaded) DiskPath() string {
+func (m *MockGeneric) DiskPath() string {
 	return m.diskPath
 }
 
 // Content returns the Content
-func (m *MockUploaded) Content() []byte {
+func (m *MockGeneric) Content() []byte {
 	return m.content
 }
 
 // Save returns the Save
-func (m *MockUploaded) Save(content []byte, overwrite bool) error {
+func (m *MockGeneric) Save(content []byte, overwrite bool) error {
 	// Don't need an actual implementation
 	return nil
 }
 
 // Delete returns the Delete
-func (m *MockUploaded) Delete() error {
+func (m *MockGeneric) Delete() error {
 	// Don't need an actual implementation
 	return nil
 }
 
 // ChangeExt returns the ChangeExt
-func (m *MockUploaded) ChangeExt(string) error {
+func (m *MockGeneric) ChangeExt(string) error {
 	// Don't need an actual implementation
 	return nil
 }

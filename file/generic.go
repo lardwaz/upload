@@ -15,23 +15,23 @@ import (
 	"go.lsl.digital/lardwaz/upload/core"
 )
 
-// Uploaded implements File interface
-type Uploaded struct {
+// Generic implements File interface
+type Generic struct {
 	url      string
 	diskPath string
 	content  []byte
 	options  sdk.Options
 }
 
-// NewUploaded returns a new Uploaded struct
-func NewUploaded(name string, opts sdk.Options) *Uploaded {
+// NewGeneric returns a new Generic struct
+func NewGeneric(name string, opts sdk.Options) *Generic {
 	dirPath := path.Join(opts.Dir(), opts.Destination())
 	name = AddTimestamp(name)
 	urlPath := path.Join(opts.MediaPrefixURL(), opts.Destination(), name)
 	currentTime := time.Now()
 	diskPath := filepath.Join(dirPath, fmt.Sprintf("%d", currentTime.Year()), fmt.Sprintf("%v", currentTime.Month()), name)
 
-	return &Uploaded{
+	return &Generic{
 		url:      urlPath,
 		diskPath: diskPath,
 		options:  opts,
@@ -39,22 +39,22 @@ func NewUploaded(name string, opts sdk.Options) *Uploaded {
 }
 
 // URLPath returns the url path of file
-func (u *Uploaded) URLPath() string {
+func (u *Generic) URLPath() string {
 	return u.url
 }
 
 // DiskPath returns the path of file on disk
-func (u *Uploaded) DiskPath() string {
+func (u *Generic) DiskPath() string {
 	return u.diskPath
 }
 
 // Content returns the path of file on disk
-func (u *Uploaded) Content() []byte {
+func (u *Generic) Content() []byte {
 	return u.content
 }
 
 // Save saves file on disk if it does not exist
-func (u *Uploaded) Save(content []byte, overwrite bool) error {
+func (u *Generic) Save(content []byte, overwrite bool) error {
 	if !overwrite {
 		return nil
 	}
@@ -84,7 +84,7 @@ func (u *Uploaded) Save(content []byte, overwrite bool) error {
 }
 
 // Delete deletes one file on disk
-func (u *Uploaded) Delete() error {
+func (u *Generic) Delete() error {
 	if err := os.Remove(u.DiskPath()); err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func (u *Uploaded) Delete() error {
 }
 
 // ChangeExt changes the extension of file on disk
-func (u *Uploaded) ChangeExt(newExt string) error {
+func (u *Generic) ChangeExt(newExt string) error {
 	if newExt == "" {
 		return nil
 	}
