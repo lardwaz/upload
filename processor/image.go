@@ -20,15 +20,6 @@ import (
 	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
-const (
-	// TypeImageJPG denotes image of file type jpg
-	TypeImageJPG = "jpg"
-	// TypeImageJPEG denotes image of file type jpeg
-	TypeImageJPEG = "jpeg"
-	// TypeImagePNG denotes image of file type png
-	TypeImagePNG = "png"
-)
-
 func init() {
 	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
