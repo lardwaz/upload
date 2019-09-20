@@ -13,7 +13,6 @@ import (
 
 	"github.com/disintegration/imaging"
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
-	"go.lsl.digital/lardwaz/upload/core"
 	"go.lsl.digital/lardwaz/upload/job"
 	"go.lsl.digital/lardwaz/upload/option"
 	"go.lsl.digital/lardwaz/upload/processor/box"
@@ -70,14 +69,14 @@ func (p *Image) Process(file sdk.Uploaded, validate bool) (sdk.Job, error) {
 	}
 
 	// Check min width and height
-	if validate && p.options.MinWidth() != core.NoLimit && config.Width < p.options.MinWidth() {
-		log.Printf("image %v lower than min width: %v\n", file.DiskPath(), p.options.MinWidth())
-		return nil, fmt.Errorf("image width less than %dpx", p.options.MinWidth())
+	if validate && p.Options().MinWidth() != option.NoLimit && config.Width < p.Options().MinWidth() {
+		log.Printf("image %v lower than min width: %v\n", file.DiskPath(), p.Options().MinWidth())
+		return nil, fmt.Errorf("image width less than %dpx", p.Options().MinWidth())
 	}
 
-	if validate && p.options.MinHeight() != core.NoLimit && config.Height < p.options.MinHeight() {
-		log.Printf("image %v lower than min height: %v\n", file.DiskPath(), p.options.MinHeight())
-		return nil, fmt.Errorf("image height less than %dpx", p.options.MinHeight())
+	if validate && p.Options().MinHeight() != option.NoLimit && config.Height < p.Options().MinHeight() {
+		log.Printf("image %v lower than min height: %v\n", file.DiskPath(), p.Options().MinHeight())
+		return nil, fmt.Errorf("image height less than %dpx", p.Options().MinHeight())
 	}
 
 	job := job.NewGeneric(file)
@@ -91,11 +90,11 @@ func (p *Image) process(job sdk.Job, config *image.Config) {
 	var (
 		img image.Image
 		err error
+
+		isPROD = p.Options().IsPROD()
 	)
 
-	formats := p.options.Formats()
-
-	formats.Each(func(name string, format sdk.OptionsFormat) {
+	p.Options().Formats().Each(func(name string, format sdk.OptionsFormat) {
 		if format.Name() == "" {
 			return
 		}
@@ -139,7 +138,7 @@ func (p *Image) process(job sdk.Job, config *image.Config) {
 
 			// Open a new image to use as backdrop layer
 			var back image.Image
-			if core.Env == core.EnvironmentDEV {
+			if !isPROD {
 				back, err = imaging.Open(diskPathBackdrop + "-" + format.Name())
 			} else {
 				var staticAsset *os.File
@@ -173,7 +172,7 @@ func (p *Image) process(job sdk.Job, config *image.Config) {
 		if format.Watermark() != nil && format.Watermark().Path() != "" {
 			diskPathWatermark := format.Watermark().Path()
 			var watermark image.Image
-			if core.Env == core.EnvironmentDEV {
+			if !isPROD {
 				watermark, err = imaging.Open(diskPathWatermark + "-" + format.Name())
 			} else {
 				var staticAsset *os.File

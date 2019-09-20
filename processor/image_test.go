@@ -11,7 +11,6 @@ import (
 
 	"github.com/stretchr/testify/suite"
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
-	"go.lsl.digital/lardwaz/upload/core"
 	"go.lsl.digital/lardwaz/upload/file"
 	"go.lsl.digital/lardwaz/upload/option"
 	"go.lsl.digital/lardwaz/upload/processor"
@@ -28,7 +27,6 @@ var update = flag.Bool("update", false, "update golden files")
 
 type imageProcessTest struct {
 	name                 string
-	prod                 bool
 	inputFile            string
 	expectedFile         string
 	expectedProcessError bool
@@ -50,37 +48,37 @@ func (s *ProcessorTestSuite) SetupSuite() {
 
 	// Test cases
 	s.imageProcessTests = []imageProcessTest{
-		{"Normal No Format", false, "normal.jpg", "noformat_normal_out.jpg", false, processor.NewImage()},
-		{"Normal No Format PNG", false, "normal.png", "noformat_normal_out.png", false, processor.NewImage()},
-		{"Normal Format", false, "normal.jpg", "format_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
-		{"Normal Format Negative Width & Height", false, "normal.jpg", "format_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("neg"), option.FormatWidth(-1), option.FormatHeight(-1)))},
-		{"PROD Normal Format", true, "normal.jpg", "format_prod_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
-		{"Normal Format PNG", false, "normal.png", "format_normal_out.png", false, processor.NewImage(option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
-		{"PROD Normal Format PNG", true, "normal.png", "format_prod_normal_out.png", false, processor.NewImage(option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
-		{"Normal Height Zero", false, "normal.jpg", "aspect_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("hzero"), option.FormatWidth(200)))},
-		{"Normal Width Zero", false, "normal.jpg", "aspect_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("wzero"), option.FormatHeight(200)))},
-		{"Normal Upscale", false, "normal.jpg", "upscale_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("upscale"), option.FormatWidth(500), option.FormatHeight(500)))},
-		{"Small Width", false, "normal.jpg", "min_normal_out.jpg", true, processor.NewImage(option.MinWidth(500))},
-		{"Small Height", false, "normal.jpg", "min_normal_out.jpg", true, processor.NewImage(option.MinHeight(500))},
-		{"Invalid File Type", false, "damaged.jpg", "invalid_normal_out.jpg", true, processor.NewImage()},
-		{"Invalid Image Type", false, "normal.gif", "invalid_normal_out.gif", true, processor.NewImage()},
-		{"Watermark Top Left", false, "normal.jpg", "watermarked_tl_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Left), option.WatermarkVertical(position.Top))))},
-		{"Watermark Top Center", false, "normal.jpg", "watermarked_tc_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Top))))},
-		{"Watermark Top Right", false, "normal.jpg", "watermarked_tr_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Right), option.WatermarkVertical(position.Top))))},
-		{"Watermark Bottom Left", false, "normal.jpg", "watermarked_bl_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Left), option.WatermarkVertical(position.Bottom))))},
-		{"Watermark Bottom Center", false, "normal.jpg", "watermarked_bc_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Bottom))))},
-		{"Watermark Bottom Right", false, "normal.jpg", "watermarked_br_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Right), option.WatermarkVertical(position.Bottom))))},
-		{"Watermark Center Left", false, "normal.jpg", "watermarked_cl_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Left), option.WatermarkVertical(position.Center))))},
-		{"Watermark Center Center", false, "normal.jpg", "watermarked_cc_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Center))))},
-		{"Watermark Center Right", false, "normal.jpg", "watermarked_cr_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Right), option.WatermarkVertical(position.Center))))},
-		{"Watermark Bad Pos", false, "normal.jpg", "watermarked_bad_prod_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(10), option.WatermarkVertical(10))))},
-		{"PROD Watermark Bad Pos", true, "normal.jpg", "watermarked_bad_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(10), option.WatermarkVertical(10))))},
-		{"Watermark Bad Pos", false, "normal.jpg", "watermarked_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("damaged"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Center))))},
-		{"Backdrop Landscape", false, "normal.jpg", "backdropped_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
-		{"PROD Backdrop Landscape", true, "normal.jpg", "backdropped_prod_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
-		{"Backdrop Portrait", false, "portrait.jpg", "backdropped_portrait_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
-		{"PROD Backdrop Portrait", true, "portrait.jpg", "backdropped_prod_portrait_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
-		{"Backdrop Damaged", false, "portrait.jpg", "backdropped_portrait_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("damaged"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
+		{"Normal No Format", "normal.jpg", "noformat_normal_out.jpg", false, processor.NewImage()},
+		{"Normal No Format PNG", "normal.png", "noformat_normal_out.png", false, processor.NewImage()},
+		{"Normal Format", "normal.jpg", "format_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
+		{"Normal Format Negative Width & Height", "normal.jpg", "format_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("neg"), option.FormatWidth(-1), option.FormatHeight(-1)))},
+		{"PROD Normal Format", "normal.jpg", "format_prod_normal_out.jpg", false, processor.NewImage(option.PROD(), option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
+		{"Normal Format PNG", "normal.png", "format_normal_out.png", false, processor.NewImage(option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
+		{"PROD Normal Format PNG", "normal.png", "format_prod_normal_out.png", false, processor.NewImage(option.PROD(), option.Formats(option.FormatName("thumb"), option.FormatWidth(200), option.FormatHeight(200)))},
+		{"Normal Height Zero", "normal.jpg", "aspect_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("hzero"), option.FormatWidth(200)))},
+		{"Normal Width Zero", "normal.jpg", "aspect_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("wzero"), option.FormatHeight(200)))},
+		{"Normal Upscale", "normal.jpg", "upscale_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("upscale"), option.FormatWidth(500), option.FormatHeight(500)))},
+		{"Small Width", "normal.jpg", "min_normal_out.jpg", true, processor.NewImage(option.MinWidth(500))},
+		{"Small Height", "normal.jpg", "min_normal_out.jpg", true, processor.NewImage(option.MinHeight(500))},
+		{"Invalid File Type", "damaged.jpg", "invalid_normal_out.jpg", true, processor.NewImage()},
+		{"Invalid Image Type", "normal.gif", "invalid_normal_out.gif", true, processor.NewImage()},
+		{"Watermark Top Left", "normal.jpg", "watermarked_tl_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Left), option.WatermarkVertical(position.Top))))},
+		{"Watermark Top Center", "normal.jpg", "watermarked_tc_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Top))))},
+		{"Watermark Top Right", "normal.jpg", "watermarked_tr_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Right), option.WatermarkVertical(position.Top))))},
+		{"Watermark Bottom Left", "normal.jpg", "watermarked_bl_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Left), option.WatermarkVertical(position.Bottom))))},
+		{"Watermark Bottom Center", "normal.jpg", "watermarked_bc_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Bottom))))},
+		{"Watermark Bottom Right", "normal.jpg", "watermarked_br_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Right), option.WatermarkVertical(position.Bottom))))},
+		{"Watermark Center Left", "normal.jpg", "watermarked_cl_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Left), option.WatermarkVertical(position.Center))))},
+		{"Watermark Center Center", "normal.jpg", "watermarked_cc_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Center))))},
+		{"Watermark Center Right", "normal.jpg", "watermarked_cr_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Right), option.WatermarkVertical(position.Center))))},
+		{"Watermark Bad Pos", "normal.jpg", "watermarked_bad_prod_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(10), option.WatermarkVertical(10))))},
+		{"PROD Watermark Bad Pos", "normal.jpg", "watermarked_bad_normal_out.jpg", false, processor.NewImage(option.PROD(), option.Formats(option.FormatName("water"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(10), option.WatermarkVertical(10))))},
+		{"Watermark Bad Pos", "normal.jpg", "watermarked_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("damaged"), option.FormatWidth(400), option.FormatHeight(400), option.FormatWatermark(watermarkOptPath, option.WatermarkHorizontal(position.Center), option.WatermarkVertical(position.Center))))},
+		{"Backdrop Landscape", "normal.jpg", "backdropped_normal_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
+		{"PROD Backdrop Landscape", "normal.jpg", "backdropped_prod_normal_out.jpg", false, processor.NewImage(option.PROD(), option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
+		{"Backdrop Portrait", "portrait.jpg", "backdropped_portrait_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
+		{"PROD Backdrop Portrait", "portrait.jpg", "backdropped_prod_portrait_out.jpg", false, processor.NewImage(option.PROD(), option.Formats(option.FormatName("back"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
+		{"Backdrop Damaged", "portrait.jpg", "backdropped_portrait_out.jpg", false, processor.NewImage(option.Formats(option.FormatName("damaged"), option.FormatWidth(200), option.FormatHeight(200), option.FormatBackdrop(backdropOptPath)))},
 	}
 }
 
@@ -98,17 +96,6 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 
 	for _, tt := range s.imageProcessTests {
 		s.Run(tt.name, func() {
-			oldEnv := core.Env
-			// Adjust environment
-			defer func() {
-				core.Env = oldEnv
-			}()
-			if tt.prod {
-				core.Env = core.EnvironmentPROD
-			} else {
-				core.Env = core.EnvironmentDEV
-			}
-
 			uploadedFile := file.NewMockGeneric(tt.inputFile, commonOpts...)
 			job, err := tt.processor.Process(uploadedFile, true)
 			if tt.expectedProcessError && err != nil {

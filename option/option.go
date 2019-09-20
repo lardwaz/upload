@@ -3,7 +3,6 @@ package option
 import (
 	"github.com/h2non/filetype/types"
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
-	"go.lsl.digital/lardwaz/upload/core"
 	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
@@ -11,7 +10,7 @@ var (
 	defaultOptions = &Opts{
 		dir:            "media",
 		mediaPrefixURL: "/media/",
-		maxSize:        core.NoLimit,
+		maxSize:        NoLimit,
 		convertTo:      make(map[types.Type]types.Type),
 	}
 )

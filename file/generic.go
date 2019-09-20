@@ -12,7 +12,7 @@ import (
 
 	"github.com/gosimple/slug"
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
-	"go.lsl.digital/lardwaz/upload/core"
+	"go.lsl.digital/lardwaz/upload/option"
 )
 
 // Generic implements File interface
@@ -61,7 +61,7 @@ func (u *Generic) Save(content []byte, overwrite bool) error {
 
 	// Verify size
 	size := len(content)
-	if u.options.MaxSize() != core.NoLimit && size > u.options.MaxSize() {
+	if u.options.MaxSize() != option.NoLimit && size > u.options.MaxSize() {
 		log.Printf("file %v greater than max file size: %v\n", u.diskPath, u.options.MaxSize())
 		return fmt.Errorf("file max size error")
 	}

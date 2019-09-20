@@ -2,18 +2,18 @@ package option
 
 import (
 	sdk "go.lsl.digital/lardwaz/sdk/upload"
-	"go.lsl.digital/lardwaz/upload/core"
 )
 
 var (
 	defaultImageOptions = &OptsImage{
-		minWidth:  core.NoLimit,
-		minHeight: core.NoLimit,
+		minWidth:  NoLimit,
+		minHeight: NoLimit,
 	}
 )
 
 // OptsImage is an implementation of OptionsImage
 type OptsImage struct {
+	OptsENV
 	minWidth  int
 	minHeight int
 	formats   sdk.OptionsFormats
@@ -84,5 +84,12 @@ func Formats(opts ...func(sdk.OptionsFormat)) func(sdk.OptionsImage) {
 		formats.Set(format)
 
 		o.SetFormats(formats)
+	}
+}
+
+// PROD returns OptionsImage to modify ENV
+func PROD() func(sdk.OptionsImage) {
+	return func(o sdk.OptionsImage) {
+		o.SetPROD(true)
 	}
 }
