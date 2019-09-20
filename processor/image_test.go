@@ -41,7 +41,7 @@ type imageProcessTest struct {
 	inputFile            string
 	expectedFile         string
 	expectedProcessError bool
-	processor            processor.Image
+	processor            sdk.ImageProcessor
 }
 
 type ProcessorTestSuite struct {

@@ -51,9 +51,9 @@ type Image struct {
 }
 
 // NewImage returns a new Image
-func NewImage(opts ...func(sdk.OptionsImage)) Image {
+func NewImage(opts ...func(sdk.OptionsImage)) *Image {
 	options := option.EvaluateImageOptions(opts...)
-	processor := Image{
+	processor := &Image{
 		options: options,
 	}
 
