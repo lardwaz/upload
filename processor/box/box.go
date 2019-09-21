@@ -1,11 +1,11 @@
 package box
 
-import sdk "go.lsl.digital/lardwaz/sdk/upload"
+import "go.lsl.digital/lardwaz/upload"
 
 // Asset represents an assetbox
-var Asset sdk.AssetBoxer
+var Asset upload.AssetBoxer
 
 // Set sets the asset box to retrieve static assets
-func Set(assetBox sdk.AssetBoxer) {
+func Set(assetBox upload.AssetBoxer) {
 	Asset = assetBox
 }

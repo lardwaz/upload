@@ -1,16 +1,16 @@
 package job
 
-import sdk "go.lsl.digital/lardwaz/sdk/upload"
+import "go.lsl.digital/lardwaz/upload"
 
 // Generic represents current image file being processed
 type Generic struct {
-	file   sdk.Uploaded
+	file   upload.Uploaded
 	done   chan struct{}
 	failed chan error
 }
 
 // NewGeneric returns a new Generic
-func NewGeneric(file sdk.Uploaded) *Generic {
+func NewGeneric(file upload.Uploaded) *Generic {
 	return &Generic{
 		file:   file,
 		done:   make(chan struct{}),
@@ -18,8 +18,8 @@ func NewGeneric(file sdk.Uploaded) *Generic {
 	}
 }
 
-// File returns the file sdk.Uploaded
-func (j Generic) File() sdk.Uploaded {
+// File returns the file upload.Uploaded
+func (j Generic) File() upload.Uploaded {
 	return j.file
 }
 

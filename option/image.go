@@ -1,7 +1,7 @@
 package option
 
 import (
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 )
 
 var (
@@ -16,7 +16,7 @@ type OptsImage struct {
 	OptsENV
 	minWidth  int
 	minHeight int
-	formats   sdk.OptionsFormats
+	formats   upload.OptionsFormats
 }
 
 // MinWidth returns MinWidth
@@ -40,17 +40,17 @@ func (o *OptsImage) SetMinHeight(h int) {
 }
 
 // Formats returns Formats
-func (o OptsImage) Formats() sdk.OptionsFormats {
+func (o OptsImage) Formats() upload.OptionsFormats {
 	return o.formats
 }
 
 // SetFormats set Formats
-func (o *OptsImage) SetFormats(opts sdk.OptionsFormats) {
+func (o *OptsImage) SetFormats(opts upload.OptionsFormats) {
 	o.formats = opts
 }
 
 // EvaluateImageOptions returns optionsImage
-func EvaluateImageOptions(opts ...func(sdk.OptionsImage)) sdk.OptionsImage {
+func EvaluateImageOptions(opts ...func(upload.OptionsImage)) upload.OptionsImage {
 	optCopy := &OptsImage{}
 	*optCopy = *defaultImageOptions
 	optCopy.formats = NewOptionsFormats()
@@ -61,22 +61,22 @@ func EvaluateImageOptions(opts ...func(sdk.OptionsImage)) sdk.OptionsImage {
 }
 
 // MinWidth returns a function to modify MinWidth option image
-func MinWidth(w int) func(sdk.OptionsImage) {
-	return func(o sdk.OptionsImage) {
+func MinWidth(w int) func(upload.OptionsImage) {
+	return func(o upload.OptionsImage) {
 		o.SetMinWidth(w)
 	}
 }
 
 // MinHeight returns a function to modify MinHeight option image
-func MinHeight(h int) func(sdk.OptionsImage) {
-	return func(o sdk.OptionsImage) {
+func MinHeight(h int) func(upload.OptionsImage) {
+	return func(o upload.OptionsImage) {
 		o.SetMinHeight(h)
 	}
 }
 
 // Formats returns a function to add Format option image
-func Formats(opts ...func(sdk.OptionsFormat)) func(sdk.OptionsImage) {
-	return func(o sdk.OptionsImage) {
+func Formats(opts ...func(upload.OptionsFormat)) func(upload.OptionsImage) {
+	return func(o upload.OptionsImage) {
 		format := EvaluateFormatOptions(opts...)
 
 		formats := o.Formats()
@@ -88,8 +88,8 @@ func Formats(opts ...func(sdk.OptionsFormat)) func(sdk.OptionsImage) {
 }
 
 // PROD returns a function to modify ENV
-func PROD() func(sdk.OptionsImage) {
-	return func(o sdk.OptionsImage) {
+func PROD() func(upload.OptionsImage) {
+	return func(o upload.OptionsImage) {
 		o.SetPROD(true)
 	}
 }

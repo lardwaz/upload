@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 	"go.lsl.digital/lardwaz/upload/option"
 )
 
@@ -20,11 +20,11 @@ type Generic struct {
 	url      string
 	diskPath string
 	content  []byte
-	options  sdk.Options
+	options  upload.Options
 }
 
 // NewGeneric returns a new Generic struct
-func NewGeneric(name string, opts sdk.Options) *Generic {
+func NewGeneric(name string, opts upload.Options) *Generic {
 	dirPath := path.Join(opts.Dir(), opts.Destination())
 	name = AddTimestamp(name)
 	urlPath := path.Join(opts.MediaPrefixURL(), opts.Destination(), name)

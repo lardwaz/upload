@@ -5,7 +5,7 @@ import (
 	"path"
 	"path/filepath"
 
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 	"go.lsl.digital/lardwaz/upload/option"
 )
 
@@ -14,11 +14,11 @@ type MockGeneric struct {
 	url      string
 	diskPath string
 	content  []byte
-	options  sdk.Options
+	options  upload.Options
 }
 
 // NewMockGeneric returns a new MockGeneric (used for testing image processing so far)
-func NewMockGeneric(name string, opts ...func(sdk.Options)) *MockGeneric {
+func NewMockGeneric(name string, opts ...func(upload.Options)) *MockGeneric {
 	options := option.EvaluateOptions(opts...)
 	dirPath := path.Join(options.Dir(), options.Destination())
 	urlPath := path.Join(options.MediaPrefixURL(), options.Destination(), name)

@@ -1,6 +1,6 @@
 package option
 
-import sdk "go.lsl.digital/lardwaz/sdk/upload"
+import "go.lsl.digital/lardwaz/upload"
 
 var (
 	defaultBackdropOptions = &OptsBackdrop{}
@@ -22,7 +22,7 @@ func (o *OptsBackdrop) SetPath(p string) {
 }
 
 // EvaluateBackdropOptions returns OptionsBackdrop
-func EvaluateBackdropOptions(opts ...func(sdk.OptionsBackdrop)) sdk.OptionsBackdrop {
+func EvaluateBackdropOptions(opts ...func(upload.OptionsBackdrop)) upload.OptionsBackdrop {
 	optCopy := &OptsBackdrop{}
 	*optCopy = *defaultBackdropOptions
 	for _, o := range opts {
@@ -32,8 +32,8 @@ func EvaluateBackdropOptions(opts ...func(sdk.OptionsBackdrop)) sdk.OptionsBackd
 }
 
 // BackdropPath returns OptionWatermark to modify BackdropPath
-func BackdropPath(p string) func(sdk.OptionsBackdrop) {
-	return func(o sdk.OptionsBackdrop) {
+func BackdropPath(p string) func(upload.OptionsBackdrop) {
+	return func(o upload.OptionsBackdrop) {
 		o.SetPath(p)
 	}
 }

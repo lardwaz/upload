@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/disintegration/imaging"
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 	"go.lsl.digital/lardwaz/upload/job"
 	"go.lsl.digital/lardwaz/upload/option"
 	"go.lsl.digital/lardwaz/upload/processor/box"
@@ -28,11 +28,11 @@ func init() {
 
 // Image implements the processor interface
 type Image struct {
-	options sdk.OptionsImage
+	options upload.OptionsImage
 }
 
 // NewImage returns a new Image
-func NewImage(opts ...func(sdk.OptionsImage)) *Image {
+func NewImage(opts ...func(upload.OptionsImage)) *Image {
 	options := option.EvaluateImageOptions(opts...)
 	processor := &Image{
 		options: options,
@@ -42,12 +42,12 @@ func NewImage(opts ...func(sdk.OptionsImage)) *Image {
 }
 
 // Options returns OptionsImage
-func (p Image) Options() sdk.OptionsImage {
+func (p Image) Options() upload.OptionsImage {
 	return p.options
 }
 
 // Process adds a job to process an image based on specific options
-func (p *Image) Process(file sdk.Uploaded, validate bool) (sdk.Job, error) {
+func (p *Image) Process(file upload.Uploaded, validate bool) (upload.Job, error) {
 	content := file.Content()
 	if !utypes.IsValidImage(content) {
 		return nil, fmt.Errorf("image type invalid")
@@ -77,7 +77,7 @@ func (p *Image) Process(file sdk.Uploaded, validate bool) (sdk.Job, error) {
 	return job, nil
 }
 
-func (p *Image) process(job sdk.Job, config *image.Config) {
+func (p *Image) process(job upload.Job, config *image.Config) {
 	var (
 		img image.Image
 		err error
@@ -85,7 +85,7 @@ func (p *Image) process(job sdk.Job, config *image.Config) {
 		isPROD = p.Options().IsPROD()
 	)
 
-	p.Options().Formats().Each(func(name string, format sdk.OptionsFormat) {
+	p.Options().Formats().Each(func(name string, format upload.OptionsFormat) {
 		if format.Name() == "" {
 			return
 		}

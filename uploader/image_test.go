@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 	"go.lsl.digital/lardwaz/upload/option"
 	utypes "go.lsl.digital/lardwaz/upload/types"
 	"go.lsl.digital/lardwaz/upload/uploader"
@@ -26,7 +26,7 @@ type imageUploadTest struct {
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	uploader             sdk.Uploader
+	uploader             upload.Uploader
 }
 
 type ImageUploaderTestSuite struct {
@@ -36,7 +36,7 @@ type ImageUploaderTestSuite struct {
 
 func (s *ImageUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
-	common := []func(sdk.Options){
+	common := []func(upload.Options){
 		option.Dir(testDataFolder),
 		option.Destination("tmp"),
 		option.MediaPrefixURL("/" + testDataFolder + "/"),
@@ -112,7 +112,7 @@ func (s *ImageUploaderTestSuite) TestImageUpload() {
 			}
 
 			// Check if file content valid
-			s.Equalf(expectedContent, content, "sdk.Uploaded content invalid")
+			s.Equalf(expectedContent, content, "upload.Uploaded content invalid")
 		})
 	}
 }

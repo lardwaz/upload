@@ -2,7 +2,7 @@ package option
 
 import (
 	"github.com/h2non/filetype/types"
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
@@ -99,7 +99,7 @@ func (o Opts) FileTypeExist(t types.Type) bool {
 }
 
 // EvaluateOptions returns list of options
-func EvaluateOptions(opts ...func(sdk.Options)) sdk.Options {
+func EvaluateOptions(opts ...func(upload.Options)) upload.Options {
 	optCopy := &Opts{}
 	*optCopy = *defaultOptions
 	for _, o := range opts {
@@ -109,43 +109,43 @@ func EvaluateOptions(opts ...func(sdk.Options)) sdk.Options {
 }
 
 // Dir returns a function to change Dir
-func Dir(dir string) func(sdk.Options) {
-	return func(o sdk.Options) {
+func Dir(dir string) func(upload.Options) {
+	return func(o upload.Options) {
 		o.SetDir(dir)
 	}
 }
 
 // Destination returns a function to change Destination
-func Destination(dest string) func(sdk.Options) {
-	return func(o sdk.Options) {
+func Destination(dest string) func(upload.Options) {
+	return func(o upload.Options) {
 		o.SetDestination(dest)
 	}
 }
 
 // MediaPrefixURL returns a function to change MediaPrefixURL
-func MediaPrefixURL(url string) func(sdk.Options) {
-	return func(o sdk.Options) {
+func MediaPrefixURL(url string) func(upload.Options) {
+	return func(o upload.Options) {
 		o.SetMediaPrefixURL(url)
 	}
 }
 
 // FileType returns a function to change FileType
-func FileType(t types.Type) func(sdk.Options) {
-	return func(o sdk.Options) {
+func FileType(t types.Type) func(upload.Options) {
+	return func(o upload.Options) {
 		o.AddFileType(t)
 	}
 }
 
 // MaxSize returns a function to change MaxSize
-func MaxSize(sz int) func(sdk.Options) {
-	return func(o sdk.Options) {
+func MaxSize(sz int) func(upload.Options) {
+	return func(o upload.Options) {
 		o.SetMaxSize(sz)
 	}
 }
 
 // ConvertTo returns a function to change ConvertTo
-func ConvertTo(old, new types.Type) func(sdk.Options) {
-	return func(o sdk.Options) {
+func ConvertTo(old, new types.Type) func(upload.Options) {
+	return func(o upload.Options) {
 		o.SetConvertTo(old, new)
 	}
 }

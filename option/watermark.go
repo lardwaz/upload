@@ -1,6 +1,6 @@
 package option
 
-import sdk "go.lsl.digital/lardwaz/sdk/upload"
+import "go.lsl.digital/lardwaz/upload"
 
 var (
 	defaultWatermarkOptions = &OptsWatermark{}
@@ -66,7 +66,7 @@ func (o *OptsWatermark) SetOffsetY(y int) {
 }
 
 // EvaluateWatermarkOptions returns OptionsWatermark
-func EvaluateWatermarkOptions(opts ...func(sdk.OptionsWatermark)) sdk.OptionsWatermark {
+func EvaluateWatermarkOptions(opts ...func(upload.OptionsWatermark)) upload.OptionsWatermark {
 	optCopy := &OptsWatermark{}
 	*optCopy = *defaultWatermarkOptions
 	for _, o := range opts {
@@ -76,36 +76,36 @@ func EvaluateWatermarkOptions(opts ...func(sdk.OptionsWatermark)) sdk.OptionsWat
 }
 
 // WatermarkPath returns OptionWatermark to modify WatermarkPath
-func WatermarkPath(p string) func(sdk.OptionsWatermark) {
-	return func(o sdk.OptionsWatermark) {
+func WatermarkPath(p string) func(upload.OptionsWatermark) {
+	return func(o upload.OptionsWatermark) {
 		o.SetPath(p)
 	}
 }
 
 // WatermarkHorizontal returns OptionWatermark to modify WatermarkHorizontal
-func WatermarkHorizontal(h int) func(sdk.OptionsWatermark) {
-	return func(o sdk.OptionsWatermark) {
+func WatermarkHorizontal(h int) func(upload.OptionsWatermark) {
+	return func(o upload.OptionsWatermark) {
 		o.SetHorizontal(h)
 	}
 }
 
 // WatermarkVertical returns OptionWatermark to modify WatermarkVertical
-func WatermarkVertical(v int) func(sdk.OptionsWatermark) {
-	return func(o sdk.OptionsWatermark) {
+func WatermarkVertical(v int) func(upload.OptionsWatermark) {
+	return func(o upload.OptionsWatermark) {
 		o.SetVertical(v)
 	}
 }
 
 // WatermarkOffsetX returns OptionWatermark to modify WatermarkOffsetX
-func WatermarkOffsetX(x int) func(sdk.OptionsWatermark) {
-	return func(o sdk.OptionsWatermark) {
+func WatermarkOffsetX(x int) func(upload.OptionsWatermark) {
+	return func(o upload.OptionsWatermark) {
 		o.SetOffsetX(x)
 	}
 }
 
 // WatermarkOffsetY returns OptionWatermark to modify WatermarkOffsetY
-func WatermarkOffsetY(y int) func(sdk.OptionsWatermark) {
-	return func(o sdk.OptionsWatermark) {
+func WatermarkOffsetY(y int) func(upload.OptionsWatermark) {
+	return func(o upload.OptionsWatermark) {
 		o.SetOffsetY(y)
 	}
 }

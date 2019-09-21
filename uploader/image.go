@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/h2non/filetype"
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 	"go.lsl.digital/lardwaz/upload/file"
 	"go.lsl.digital/lardwaz/upload/option"
 	utypes "go.lsl.digital/lardwaz/upload/types"
@@ -12,17 +12,17 @@ import (
 
 // Image is an image uploader
 type Image struct {
-	Options sdk.Options
+	Options upload.Options
 }
 
 // NewImage returns Image
-func NewImage(opts ...func(sdk.Options)) *Image {
+func NewImage(opts ...func(upload.Options)) *Image {
 	options := option.EvaluateOptions(opts...)
 	return &Image{Options: options}
 }
 
 // Upload method to satisfy uploader interface
-func (u *Image) Upload(name string, content []byte) (sdk.Uploaded, error) {
+func (u *Image) Upload(name string, content []byte) (upload.Uploaded, error) {
 	if !utypes.IsValidImage(content) {
 		return nil, fmt.Errorf("Not a valid image")
 	}

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	sdk "go.lsl.digital/lardwaz/sdk/upload"
+	"go.lsl.digital/lardwaz/upload"
 	"go.lsl.digital/lardwaz/upload/file"
 	"go.lsl.digital/lardwaz/upload/option"
 	"go.lsl.digital/lardwaz/upload/processor"
@@ -30,7 +30,7 @@ type imageProcessTest struct {
 	inputFile            string
 	expectedFile         string
 	expectedProcessError bool
-	processor            sdk.ImageProcessor
+	processor            upload.ImageProcessor
 }
 
 type ProcessorTestSuite struct {
@@ -84,7 +84,7 @@ func (s *ProcessorTestSuite) SetupSuite() {
 
 func (s *ProcessorTestSuite) TestImageProcess() {
 	// Common upload configurations
-	commonOpts := []func(sdk.Options){
+	commonOpts := []func(upload.Options){
 		option.Dir(testDataFolder),
 		option.MediaPrefixURL("/" + testDataFolder + "/"),
 		option.FileType(utypes.TypeJPEG),
@@ -108,16 +108,16 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 
 			select {
 			case <-time.After(3 * time.Second):
-				// sdk.Job timed out! Did we expect?
+				// upload.Job timed out! Did we expect?
 				if !tt.expectedProcessError {
 					s.Failf("Cannot process file", "%s: Timed out!", job.File().DiskPath())
 					return
 				}
 			case <-job.Done():
-			// sdk.Job done! We are good!
+			// upload.Job done! We are good!
 
 			case err = <-job.Failed():
-				// sdk.Job failed! Did we expect?
+				// upload.Job failed! Did we expect?
 				if !tt.expectedProcessError {
 					s.Failf("Cannot process file", "%s: %v", job.File().DiskPath(), err)
 					return
@@ -126,7 +126,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 
 			formats := tt.processor.Options().Formats()
 
-			formats.Each(func(name string, format sdk.OptionsFormat) {
+			formats.Each(func(name string, format upload.OptionsFormat) {
 				fileDiskPath := job.File().DiskPath() + "-" + format.Name()
 				content, err := ioutil.ReadFile(fileDiskPath)
 				if err != nil {
@@ -156,7 +156,7 @@ func (s *ProcessorTestSuite) TestImageProcess() {
 				}
 
 				// Check if file content valid
-				s.Equalf(expectedContent, content, "sdk.Uploaded content invalid")
+				s.Equalf(expectedContent, content, "upload.Uploaded content invalid")
 			})
 		})
 	}
