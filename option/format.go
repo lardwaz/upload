@@ -2,10 +2,6 @@ package option
 
 import "go.lsl.digital/lardwaz/upload"
 
-var (
-	defaultFormatOptions = &OptsFormat{}
-)
-
 // OptsFormat holds dimensions options for Format
 type OptsFormat struct {
 	name      string
@@ -15,14 +11,21 @@ type OptsFormat struct {
 	watermark upload.OptionsWatermark // (default: nil) If not nil, will overlay an image as watermark at X,Y pos +-OffsetX,OffsetY
 }
 
+// NewFormat returns a new OptionsFormat
+func NewFormat() upload.OptionsFormat {
+	return &OptsFormat{}
+}
+
 // Name returns Name
 func (o OptsFormat) Name() string {
 	return o.name
 }
 
 // SetName sets the Name
-func (o *OptsFormat) SetName(n string) {
+func (o *OptsFormat) SetName(n string) upload.OptionsFormat {
 	o.name = n
+
+	return o
 }
 
 // Width returns Width
@@ -31,8 +34,10 @@ func (o OptsFormat) Width() int {
 }
 
 // SetWidth sets the Width
-func (o *OptsFormat) SetWidth(w int) {
+func (o *OptsFormat) SetWidth(w int) upload.OptionsFormat {
 	o.width = w
+
+	return o
 }
 
 // Height returns Height
@@ -41,8 +46,10 @@ func (o OptsFormat) Height() int {
 }
 
 // SetHeight sets the Height
-func (o *OptsFormat) SetHeight(h int) {
+func (o *OptsFormat) SetHeight(h int) upload.OptionsFormat {
 	o.height = h
+
+	return o
 }
 
 // Backdrop returns Backdrop
@@ -51,8 +58,10 @@ func (o OptsFormat) Backdrop() upload.OptionsBackdrop {
 }
 
 // SetBackdrop sets the Backdrop
-func (o *OptsFormat) SetBackdrop(opts ...func(upload.OptionsBackdrop)) {
+func (o *OptsFormat) SetBackdrop(opts ...func(upload.OptionsBackdrop)) upload.OptionsFormat {
 	o.backdrop = EvaluateBackdropOptions(opts...)
+
+	return o
 }
 
 // Watermark returns Watermark
@@ -61,14 +70,15 @@ func (o OptsFormat) Watermark() upload.OptionsWatermark {
 }
 
 // SetWatermark sets the watermark
-func (o *OptsFormat) SetWatermark(opts ...func(upload.OptionsWatermark)) {
+func (o *OptsFormat) SetWatermark(opts ...func(upload.OptionsWatermark)) upload.OptionsFormat {
 	o.watermark = EvaluateWatermarkOptions(opts...)
+
+	return o
 }
 
 // EvaluateFormatOptions returns optionsImage
 func EvaluateFormatOptions(opts ...func(upload.OptionsFormat)) upload.OptionsFormat {
-	optCopy := &OptsFormat{}
-	*optCopy = *defaultFormatOptions
+	optCopy := NewFormat()
 	for _, o := range opts {
 		o(optCopy)
 	}

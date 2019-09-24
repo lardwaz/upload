@@ -6,15 +6,6 @@ import (
 	utypes "go.lsl.digital/lardwaz/upload/types"
 )
 
-var (
-	defaultOptions = &Opts{
-		dir:            "media",
-		mediaPrefixURL: "/media/",
-		maxSize:        NoLimit,
-		convertTo:      make(map[types.Type]types.Type),
-	}
-)
-
 // Opts is an implementation of Options
 type Opts struct {
 	dir            string
@@ -25,14 +16,26 @@ type Opts struct {
 	convertTo      map[types.Type]types.Type
 }
 
+// NewUpload return a new options
+func NewUpload() upload.Options {
+	return &Opts{
+		dir:            "media",
+		mediaPrefixURL: "/media/",
+		maxSize:        NoLimit,
+		convertTo:      make(map[types.Type]types.Type),
+	}
+}
+
 // Dir returns Dir
 func (o Opts) Dir() string {
 	return o.dir
 }
 
 // SetDir sets the Dir
-func (o *Opts) SetDir(dir string) {
+func (o *Opts) SetDir(dir string) upload.Options {
 	o.dir = dir
+
+	return o
 }
 
 // Destination returns Destination
@@ -41,8 +44,10 @@ func (o Opts) Destination() string {
 }
 
 // SetDestination sets the Destination
-func (o *Opts) SetDestination(dest string) {
+func (o *Opts) SetDestination(dest string) upload.Options {
 	o.destination = dest
+
+	return o
 }
 
 // MediaPrefixURL returns MediaPrefixURL
@@ -51,8 +56,10 @@ func (o Opts) MediaPrefixURL() string {
 }
 
 // SetMediaPrefixURL sets the MediaPrefixURL
-func (o *Opts) SetMediaPrefixURL(url string) {
+func (o *Opts) SetMediaPrefixURL(url string) upload.Options {
 	o.mediaPrefixURL = url
+
+	return o
 }
 
 // FileType returns FileType
@@ -61,10 +68,12 @@ func (o Opts) FileType() []types.Type {
 }
 
 // AddFileType adds another the FileType
-func (o *Opts) AddFileType(t types.Type) {
+func (o *Opts) AddFileType(t types.Type) upload.Options {
 	if utypes.IsValidType(t) && !o.FileTypeExist(t) {
 		o.fileType = append(o.fileType, t)
 	}
+
+	return o
 }
 
 // MaxSize returns MaxSize
@@ -73,8 +82,10 @@ func (o Opts) MaxSize() int {
 }
 
 // SetMaxSize sets the MaxSize
-func (o *Opts) SetMaxSize(sz int) {
+func (o *Opts) SetMaxSize(sz int) upload.Options {
 	o.maxSize = sz
+
+	return o
 }
 
 // ConvertTo returns ConvertTo
@@ -83,8 +94,10 @@ func (o Opts) ConvertTo(t types.Type) types.Type {
 }
 
 // SetConvertTo sets the MaxSize
-func (o *Opts) SetConvertTo(old types.Type, new types.Type) {
+func (o *Opts) SetConvertTo(old types.Type, new types.Type) upload.Options {
 	o.convertTo[old] = new
+
+	return o
 }
 
 // FileTypeExist checks if filetype exists
@@ -100,8 +113,7 @@ func (o Opts) FileTypeExist(t types.Type) bool {
 
 // EvaluateOptions returns list of options
 func EvaluateOptions(opts ...func(upload.Options)) upload.Options {
-	optCopy := &Opts{}
-	*optCopy = *defaultOptions
+	optCopy := NewUpload()
 	for _, o := range opts {
 		o(optCopy)
 	}

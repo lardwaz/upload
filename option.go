@@ -13,17 +13,17 @@ type OptionsENV interface {
 // Options represents a set of upload options
 type Options interface {
 	Dir() string
-	SetDir(string)
+	SetDir(string) Options
 	Destination() string
-	SetDestination(string)
+	SetDestination(string) Options
 	MediaPrefixURL() string
-	SetMediaPrefixURL(string)
+	SetMediaPrefixURL(string) Options
 	FileType() []types.Type
-	AddFileType(types.Type)
+	AddFileType(types.Type) Options
 	MaxSize() int
-	SetMaxSize(sz int)
+	SetMaxSize(sz int) Options
 	ConvertTo(t types.Type) types.Type
-	SetConvertTo(old types.Type, new types.Type)
+	SetConvertTo(old types.Type, new types.Type) Options
 	FileTypeExist(t types.Type) bool
 }
 
@@ -31,11 +31,11 @@ type Options interface {
 type OptionsImage interface {
 	OptionsENV
 	MinWidth() int
-	SetMinWidth(w int)
+	SetMinWidth(w int) OptionsImage
 	MinHeight() int
-	SetMinHeight(h int)
+	SetMinHeight(h int) OptionsImage
 	Formats() OptionsFormats
-	SetFormats(opts OptionsFormats)
+	SetFormats(opts OptionsFormats) OptionsImage
 }
 
 // OptionsFormats represents a list of OptionsFormat
@@ -59,33 +59,33 @@ type OptionsFormats interface {
 // OptionsFormat represents a set of format processing options
 type OptionsFormat interface {
 	Name() string
-	SetName(n string)
+	SetName(n string) OptionsFormat
 	Width() int
-	SetWidth(w int)
+	SetWidth(w int) OptionsFormat
 	Height() int
-	SetHeight(h int)
+	SetHeight(h int) OptionsFormat
 	Backdrop() OptionsBackdrop
-	SetBackdrop(opts ...func(OptionsBackdrop))
+	SetBackdrop(opts ...func(OptionsBackdrop)) OptionsFormat
 	Watermark() OptionsWatermark
-	SetWatermark(opts ...func(OptionsWatermark))
+	SetWatermark(opts ...func(OptionsWatermark)) OptionsFormat
 }
 
 // OptionsBackdrop represents a set of backdrop processing options
 type OptionsBackdrop interface {
 	Path() string
-	SetPath(p string)
+	SetPath(p string) OptionsBackdrop
 }
 
 // OptionsWatermark represents a set of watermark processing options
 type OptionsWatermark interface {
 	Path() string
-	SetPath(p string)
+	SetPath(p string) OptionsWatermark
 	Horizontal() int
-	SetHorizontal(h int)
+	SetHorizontal(h int) OptionsWatermark
 	Vertical() int
-	SetVertical(v int)
+	SetVertical(v int) OptionsWatermark
 	OffsetX() int
-	SetOffsetX(x int)
+	SetOffsetX(x int) OptionsWatermark
 	OffsetY() int
-	SetOffsetY(y int)
+	SetOffsetY(y int) OptionsWatermark
 }

@@ -2,10 +2,6 @@ package option
 
 import "go.lsl.digital/lardwaz/upload"
 
-var (
-	defaultWatermarkOptions = &OptsWatermark{}
-)
-
 // OptsWatermark is an implementation of OptionsWatermark
 type OptsWatermark struct {
 	path       string
@@ -15,14 +11,21 @@ type OptsWatermark struct {
 	offsetY    int
 }
 
+// NewWatermark returns a new OptionsWatermark
+func NewWatermark() upload.OptionsWatermark {
+	return &OptsWatermark{}
+}
+
 // Path returns Path
 func (o *OptsWatermark) Path() string {
 	return o.path
 }
 
 // SetPath sets Path
-func (o *OptsWatermark) SetPath(p string) {
+func (o *OptsWatermark) SetPath(p string) upload.OptionsWatermark {
 	o.path = p
+
+	return o
 }
 
 // Horizontal returns Horizontal
@@ -31,8 +34,10 @@ func (o *OptsWatermark) Horizontal() int {
 }
 
 // SetHorizontal sets Horizontal
-func (o *OptsWatermark) SetHorizontal(h int) {
+func (o *OptsWatermark) SetHorizontal(h int) upload.OptionsWatermark {
 	o.horizontal = h
+
+	return o
 }
 
 // Vertical returns Vertical
@@ -41,8 +46,10 @@ func (o *OptsWatermark) Vertical() int {
 }
 
 // SetVertical sets Vertical
-func (o *OptsWatermark) SetVertical(v int) {
+func (o *OptsWatermark) SetVertical(v int) upload.OptionsWatermark {
 	o.vertical = v
+
+	return o
 }
 
 // OffsetX returns OffsetX
@@ -51,8 +58,10 @@ func (o *OptsWatermark) OffsetX() int {
 }
 
 // SetOffsetX sets OffsetX
-func (o *OptsWatermark) SetOffsetX(x int) {
+func (o *OptsWatermark) SetOffsetX(x int) upload.OptionsWatermark {
 	o.offsetX = x
+
+	return o
 }
 
 // OffsetY returns OffsetY
@@ -61,14 +70,15 @@ func (o *OptsWatermark) OffsetY() int {
 }
 
 // SetOffsetY sets OffsetY
-func (o *OptsWatermark) SetOffsetY(y int) {
+func (o *OptsWatermark) SetOffsetY(y int) upload.OptionsWatermark {
 	o.offsetY = y
+
+	return o
 }
 
 // EvaluateWatermarkOptions returns OptionsWatermark
 func EvaluateWatermarkOptions(opts ...func(upload.OptionsWatermark)) upload.OptionsWatermark {
-	optCopy := &OptsWatermark{}
-	*optCopy = *defaultWatermarkOptions
+	optCopy := NewWatermark()
 	for _, o := range opts {
 		o(optCopy)
 	}

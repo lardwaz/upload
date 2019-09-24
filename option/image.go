@@ -4,13 +4,6 @@ import (
 	"go.lsl.digital/lardwaz/upload"
 )
 
-var (
-	defaultImageOptions = &OptsImage{
-		minWidth:  NoLimit,
-		minHeight: NoLimit,
-	}
-)
-
 // OptsImage is an implementation of OptionsImage
 type OptsImage struct {
 	OptsENV
@@ -19,14 +12,25 @@ type OptsImage struct {
 	formats   upload.OptionsFormats
 }
 
+// NewImage returns a new upload.OptionsImage
+func NewImage() upload.OptionsImage {
+	return &OptsImage{
+		minWidth:  NoLimit,
+		minHeight: NoLimit,
+		formats:   NewOptionsFormats(),
+	}
+}
+
 // MinWidth returns MinWidth
 func (o OptsImage) MinWidth() int {
 	return o.minWidth
 }
 
 // SetMinWidth sets MinWidth
-func (o *OptsImage) SetMinWidth(w int) {
+func (o *OptsImage) SetMinWidth(w int) upload.OptionsImage {
 	o.minWidth = w
+
+	return o
 }
 
 // MinHeight returns MinHeight
@@ -35,8 +39,10 @@ func (o OptsImage) MinHeight() int {
 }
 
 // SetMinHeight sets MinHeight
-func (o *OptsImage) SetMinHeight(h int) {
+func (o *OptsImage) SetMinHeight(h int) upload.OptionsImage {
 	o.minHeight = h
+
+	return o
 }
 
 // Formats returns Formats
@@ -45,15 +51,15 @@ func (o OptsImage) Formats() upload.OptionsFormats {
 }
 
 // SetFormats set Formats
-func (o *OptsImage) SetFormats(opts upload.OptionsFormats) {
+func (o *OptsImage) SetFormats(opts upload.OptionsFormats) upload.OptionsImage {
 	o.formats = opts
+
+	return o
 }
 
 // EvaluateImageOptions returns optionsImage
 func EvaluateImageOptions(opts ...func(upload.OptionsImage)) upload.OptionsImage {
-	optCopy := &OptsImage{}
-	*optCopy = *defaultImageOptions
-	optCopy.formats = NewOptionsFormats()
+	optCopy := NewImage()
 	for _, o := range opts {
 		o(optCopy)
 	}
