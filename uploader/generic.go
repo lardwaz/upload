@@ -1,24 +1,27 @@
-package upload
+package uploader
 
 import (
 	"fmt"
+
 	"github.com/h2non/filetype"
+	"go.lsl.digital/lardwaz/upload"
+	"go.lsl.digital/lardwaz/upload/file"
+	"go.lsl.digital/lardwaz/upload/option"
 )
 
-// GenericUploader is a generic uploader
-// Does not have a processor
-type GenericUploader struct {
-	Options  *Options
+// Generic is a Generic uploader
+type Generic struct {
+	Options upload.Options
 }
 
-// NewGenericUploader returns GenericUploader
-// Does not have a processor
-func NewGenericUploader(common *Options) *GenericUploader {
-	return &GenericUploader{Options: common}
+// NewGeneric returns Generic
+func NewGeneric(opts ...func(upload.Options)) *Generic {
+	options := option.EvaluateOptions(opts...)
+	return &Generic{Options: options}
 }
 
 // Upload method to satisfy uploader interface
-func (u *GenericUploader) Upload(name string, content []byte) (*UploadedFile, error) {
+func (u *Generic) Upload(name string, content []byte) (upload.Uploaded, error) {
 	fileType, err := filetype.Match(content)
 	if err != nil {
 		return nil, fmt.Errorf("Error retrieving file type: %v", err)
@@ -28,7 +31,7 @@ func (u *GenericUploader) Upload(name string, content []byte) (*UploadedFile, er
 		return nil, fmt.Errorf("Unknown file type")
 	}
 
-	uploadedFile := NewUploadedFile(name, *u.Options)
+	uploadedFile := file.NewGeneric(name, u.Options)
 
 	if err := uploadedFile.Save(content, true); err != nil {
 		return nil, err

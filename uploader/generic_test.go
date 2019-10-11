@@ -1,4 +1,4 @@
-package upload_test
+package uploader_test
 
 // Basic imports
 import (
@@ -7,8 +7,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"go.lsl.digital/gocipe/upload"
-
+	"go.lsl.digital/lardwaz/upload"
+	"go.lsl.digital/lardwaz/upload/option"
+	utypes "go.lsl.digital/lardwaz/upload/types"
+	"go.lsl.digital/lardwaz/upload/uploader"
 )
 
 type genericUploadTest struct {
@@ -17,7 +19,7 @@ type genericUploadTest struct {
 	expectedFile         string
 	expectedUploadError  bool
 	expectedContentError bool
-	uploader             *upload.GenericUploader
+	uploader             *uploader.Generic
 }
 
 type GenericUploaderTestSuite struct {
@@ -27,39 +29,38 @@ type GenericUploaderTestSuite struct {
 
 func (s *GenericUploaderTestSuite) SetupSuite() {
 	// Common upload configurations
-	common := []upload.Option{
-		upload.Dir(testDataFolder),
-		upload.Destination("tmp"),
-		upload.MediaPrefixURL("/"+testDataFolder+"/"),
-		upload.FileType(upload.TypePDF),
-		upload.FileType(upload.TypeMP3),
-		upload.FileType(upload.TypeMP4),
-		upload.FileType(upload.TypeZIP),
+	common := []func(upload.Options){
+		option.Dir(testDataFolder),
+		option.Destination("tmp"),
+		option.MediaPrefixURL("/" + testDataFolder + "/"),
+		option.FileType(utypes.TypePDF),
+		option.FileType(utypes.TypeMP3),
+		option.FileType(utypes.TypeMP4),
+		option.FileType(utypes.TypeZIP),
 	}
 
-	commonOpts := upload.EvaluateOptions(common...)
-	commonMaxSizeOpts := upload.EvaluateOptions(append(common, upload.MaxSize(300))...)
-	commonPDFMP3Opts := upload.EvaluateOptions(append(common, upload.ConvertTo(upload.TypePDF, upload.TypeMP3))...)
+	commonMaxSizeOpts := append(common, option.MaxSize(300))
+	commonPDFMP3Opts := append(common, option.ConvertTo(utypes.TypePDF, utypes.TypeMP3))
 
 	// Test cases
 	s.genericUploadTests = []genericUploadTest{
-		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(commonOpts)},
-		{"PDF to MP3", "normal.pdf", "normal_convert_out.mp3", false, false, upload.NewGenericUploader(commonPDFMP3Opts)},
-		{"PDF", "normal.pdf", "normal_out.pdf", false, false, upload.NewGenericUploader(commonOpts)},
-		{"MP3", "normal.mp3", "normal_out.mp3", false, false, upload.NewGenericUploader(commonOpts)},
-		{"MP4", "normal.mp4", "normal_out.mp4", false, false, upload.NewGenericUploader(commonOpts)},
-		{"ZIP", "normal.zip", "normal_out.zip", false, false, upload.NewGenericUploader(commonOpts)},
-		{"ZIP (Max Size)", "normal.zip", "normal_out.zip", true, false, upload.NewGenericUploader(commonMaxSizeOpts)},
-		{"TXT (invalid)", "normal.txt", "normal_out.txt", true, false, upload.NewGenericUploader(commonOpts)},
-		{"JS (invalid)", "normal.js", "normal_out.js", true, false, upload.NewGenericUploader(commonOpts)},
-		{"PHP (invalid)", "normal.php", "normal_out.php", true, false, upload.NewGenericUploader(commonOpts)},
-		{"JPG (invalid + damaged)", "damaged.jpg", "damaged_out.php", true, false, upload.NewGenericUploader(commonOpts)},
+		{"PDF", "normal.pdf", "normal_out.pdf", false, false, uploader.NewGeneric(common...)},
+		{"PDF to MP3", "normal.pdf", "normal_convert_out.mp3", false, false, uploader.NewGeneric(commonPDFMP3Opts...)},
+		{"PDF", "normal.pdf", "normal_out.pdf", false, false, uploader.NewGeneric(common...)},
+		{"MP3", "normal.mp3", "normal_out.mp3", false, false, uploader.NewGeneric(common...)},
+		{"MP4", "normal.mp4", "normal_out.mp4", false, false, uploader.NewGeneric(common...)},
+		{"ZIP", "normal.zip", "normal_out.zip", false, false, uploader.NewGeneric(common...)},
+		{"ZIP (Max Size)", "normal.zip", "normal_out.zip", true, false, uploader.NewGeneric(commonMaxSizeOpts...)},
+		{"TXT (invalid)", "normal.txt", "normal_out.txt", true, false, uploader.NewGeneric(common...)},
+		{"JS (invalid)", "normal.js", "normal_out.js", true, false, uploader.NewGeneric(common...)},
+		{"PHP (invalid)", "normal.php", "normal_out.php", true, false, uploader.NewGeneric(common...)},
+		{"JPG (invalid + damaged)", "damaged.jpg", "damaged_out.php", true, false, uploader.NewGeneric(common...)},
 	}
 }
 
 func (s *GenericUploaderTestSuite) TestGenericUpload() {
 	for _, tt := range s.genericUploadTests {
-		s.Run(tt.name, func(){
+		s.Run(tt.name, func() {
 			inputContent, err := ioutil.ReadFile(filepath.Join(testDataFolder, tt.inputFile))
 			if err != nil {
 				s.Failf("Cannot open input golden file", "%s: %v", tt.inputFile, err)
@@ -105,7 +106,7 @@ func (s *GenericUploaderTestSuite) TestGenericUpload() {
 			}
 
 			// Check if file content valid
-			s.Equalf(expectedContent, content, "Uploaded content invalid")
+			s.Equalf(expectedContent, content, "upload.Uploaded content invalid")
 		})
 	}
 }
